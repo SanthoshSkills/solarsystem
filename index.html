@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>3D Solar System Simulator</title>
+    <meta name="description" content="An interactive, 3D navigable solar system simulator with realistic planetary orbits." />
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap');
+
+      :root {
+        --bg-color: #000000;
+        --text-primary: #ffffff;
+        --text-secondary: rgba(255, 255, 255, 0.7);
+        --accent-color: #4a90e2;
+        --glass-bg: rgba(255, 255, 255, 0.05);
+        --glass-border: rgba(255, 255, 255, 0.1);
+        --glass-blur: blur(12px);
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: 'Outfit', sans-serif;
+        background-color: var(--bg-color);
+        color: var(--text-primary);
+        overflow: hidden;
+        width: 100vw;
+        height: 100vh;
+      }
+
+      #app {
+        width: 100%;
+        height: 100%;
+        position: relative;
+      }
+
+      #solar-canvas {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 1;
+      }
+
+      #ui-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 2;
+        pointer-events: none;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        padding: 2rem;
+      }
+
+      header {
+        pointer-events: auto;
+      }
+
+      header h1 {
+        font-weight: 600;
+        font-size: 2rem;
+        letter-spacing: -0.02em;
+        background: linear-gradient(to right, #ffffff, #4a90e2);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+
+      header p {
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+        margin-top: 0.25rem;
+      }
+
+      .glass-panel {
+        pointer-events: auto;
+        background: var(--glass-bg);
+        backdrop-filter: var(--glass-blur);
+        -webkit-backdrop-filter: var(--glass-blur);
+        border: 1px solid var(--glass-border);
+        border-radius: 20px;
+        padding: 1.5rem;
+        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+      }
+
+      #planet-info {
+        width: 380px;
+        position: fixed;
+        top: 2rem;
+        right: 2rem;
+        z-index: 9999;
+        transition: opacity 0.3s ease-out, transform 0.3s ease-out;
+        opacity: 0;
+        pointer-events: none;
+        transform: translateY(-20px);
+      }
+
+      #planet-name {
+        font-size: 1.8rem;
+        margin-bottom: 0.5rem;
+        border-bottom: 1px solid var(--glass-border);
+        padding-bottom: 0.5rem;
+        color: #fff;
+      }
+
+      .info-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.75rem;
+        margin: 1rem 0;
+      }
+
+      .info-item {
+        display: flex;
+        flex-direction: column;
+        font-size: 0.8rem;
+      }
+
+      .label {
+        color: var(--text-secondary);
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-bottom: 0.2rem;
+      }
+
+      .value {
+        font-weight: 600;
+        color: var(--accent-color);
+        font-size: 0.95rem;
+      }
+
+      #planet-fun-fact {
+        font-style: italic;
+        font-size: 0.85rem;
+        margin: 1rem 0;
+        padding: 0.75rem;
+        background: rgba(74, 144, 226, 0.1);
+        border-left: 3px solid var(--accent-color);
+        border-radius: 4px;
+      }
+
+      #planet-description {
+        font-size: 0.85rem;
+        line-height: 1.6;
+        color: var(--text-secondary);
+        margin-bottom: 1rem;
+      }
+
+      .toggle-container {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-top: 10px;
+        justify-content: center;
+      }
+
+      .switch {
+        position: relative;
+        display: inline-block;
+        width: 40px;
+        height: 20px;
+      }
+
+      .switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+      }
+
+      .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #333;
+        transition: .4s;
+        border-radius: 34px;
+      }
+
+      .slider:before {
+        position: absolute;
+        content: "";
+        height: 14px;
+        width: 14px;
+        left: 3px;
+        bottom: 3px;
+        background-color: white;
+        transition: .4s;
+        border-radius: 50%;
+      }
+
+      input:checked + .slider {
+        background-color: var(--accent-color);
+      }
+
+      input:checked + .slider:before {
+        transform: translateX(20px);
+      }
+
+      button {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid var(--glass-border);
+        background: rgba(255, 255, 255, 0.1);
+        color: white;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: all 0.2s;
+        font-family: inherit;
+        font-weight: 600;
+      }
+
+      button:hover {
+        background: rgba(255, 255, 255, 0.2);
+        border-color: var(--accent-color);
+      }
+
+      #controls-hint {
+        text-align: center;
+        color: var(--text-secondary);
+        font-size: 0.8rem;
+        padding: 0.5rem 1.5rem;
+        background: rgba(0, 0, 0, 0.4);
+        border: 1px solid var(--glass-border);
+        border-radius: 50px;
+        width: fit-content;
+        margin: 0 auto;
+        pointer-events: auto;
+        position: absolute;
+        bottom: 2rem;
+        left: 50%;
+        transform: translateX(-50%);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app">
+      <canvas id="solar-canvas"></canvas>
+      
+      <div id="ui-overlay">
+        <header>
+          <h1>Solar System Simulator</h1>
+          <p id="system-time">Real-time Simulation</p>
+        </header>
+        
+        <div id="planet-info" class="glass-panel">
+          <h2 id="planet-name">Planet Name</h2>
+          <div class="info-grid">
+            <div class="info-item">
+              <span class="label">Mass</span>
+              <span id="planet-mass" class="value">-</span>
+            </div>
+            <div class="info-item">
+              <span class="label">Gravity</span>
+              <span id="planet-gravity" class="value">-</span>
+            </div>
+            <div class="info-item">
+              <span class="label">Temperature</span>
+              <span id="planet-temp" class="value">-</span>
+            </div>
+            <div class="info-item">
+              <span class="label">Velocity</span>
+              <span id="planet-velocity" class="value">-</span>
+            </div>
+          </div>
+          <div class="info-item" style="margin-bottom: 1rem;">
+            <span class="label">Major Moons</span>
+            <span id="planet-moons-list" class="value" style="font-size: 0.85rem; color: #fff;">-</span>
+          </div>
+          <p id="planet-fun-fact"></p>
+          <p id="planet-description"></p>
+          <button id="close-info">Close</button>
+        </div>
+
+        <div id="controls-hint">
+          <p>🖱️ Left Click: Rotate | ↔️ Right Click: Pan | 🔍 Scroll: Zoom</p>
+          <div class="toggle-container">
+            <label class="switch">
+              <input type="checkbox" id="toggle-moons" checked>
+              <span class="slider round"></span>
+            </label>
+            <span>Show Moons</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="module" src="/main.js"></script>
+  </body>
+</html>
