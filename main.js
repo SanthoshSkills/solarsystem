@@ -224,6 +224,10 @@ const planetVel = document.getElementById('planet-velocity');
 const planetFact = document.getElementById('planet-fun-fact');
 const planetDesc = document.getElementById('planet-description');
 
+// Navigation List
+const navList = [sunData, ...planetsData];
+let currentNavIndex = -1;
+
 // Interaction targets
 let interactionTargets = [sun, ...planets.map(p => p.mesh)];
 function updateTargets() {
@@ -235,6 +239,32 @@ function updateTargets() {
   }
 }
 updateTargets();
+
+function getObjectByName(name) {
+  if (name === "Sun") return sun;
+  const pObj = planets.find(p => p.data.name === name);
+  return pObj ? pObj.mesh : null;
+}
+
+function focusOnObject(data) {
+  const obj = getObjectByName(data.name);
+  if (obj) {
+    const targetPos = new THREE.Vector3();
+    obj.getWorldPosition(targetPos);
+    
+    // Smooth transition target for OrbitControls
+    controls.target.lerp(targetPos, 0.1);
+    
+    // Adjust camera distance based on object size
+    const distance = data.radius * 5 + 20;
+    const direction = camera.position.clone().sub(controls.target).normalize();
+    const newPos = targetPos.clone().add(direction.multiplyScalar(distance));
+    camera.position.lerp(newPos, 0.05);
+  }
+}
+
+let focusing = false;
+let focusData = null;
 
 window.addEventListener('mousemove', (event) => {
   const rect = canvas.getBoundingClientRect();
@@ -266,12 +296,19 @@ window.addEventListener('mousemove', (event) => {
 window.addEventListener('click', () => {
   if (hoveredObject) {
     pinnedObject = hoveredObject;
+    currentNavIndex = navList.findIndex(b => b.name === pinnedObject.userData.name);
     showInfo(hoveredObject.userData);
+    focusing = true;
+    focusData = hoveredObject.userData;
   } else {
-    pinnedObject = null;
-    planetInfo.style.opacity = '0';
-    planetInfo.style.pointerEvents = 'none';
-    planetInfo.style.transform = 'translateY(-20px)';
+    // Only clear if clicking background, not UI
+    if (event.target === canvas) {
+      pinnedObject = null;
+      focusing = false;
+      planetInfo.style.opacity = '0';
+      planetInfo.style.pointerEvents = 'none';
+      planetInfo.style.transform = 'translateY(-20px)';
+    }
   }
 });
 
@@ -296,8 +333,34 @@ function showInfo(data) {
   planetInfo.style.transform = 'none';
 }
 
+// Navigation Listeners
+document.getElementById('prev-btn').addEventListener('click', (e) => {
+  e.stopPropagation();
+  currentNavIndex = (currentNavIndex - 1 + navList.length) % navList.length;
+  const data = navList[currentNavIndex];
+  pinnedObject = { userData: data }; // Mock for logic
+  const mesh = getObjectByName(data.name);
+  if (mesh) pinnedObject = mesh;
+  showInfo(data);
+  focusing = true;
+  focusData = data;
+});
+
+document.getElementById('next-btn').addEventListener('click', (e) => {
+  e.stopPropagation();
+  currentNavIndex = (currentNavIndex + 1) % navList.length;
+  const data = navList[currentNavIndex];
+  pinnedObject = { userData: data }; // Mock for logic
+  const mesh = getObjectByName(data.name);
+  if (mesh) pinnedObject = mesh;
+  showInfo(data);
+  focusing = true;
+  focusData = data;
+});
+
 document.getElementById('close-info').addEventListener('click', () => {
   pinnedObject = null;
+  focusing = false;
   planetInfo.style.opacity = '0';
   planetInfo.style.pointerEvents = 'none';
   planetInfo.style.transform = 'translateY(-20px)';
@@ -351,6 +414,10 @@ function animate() {
   sun.rotation.y += 0.002;
   const pulse = 1 + Math.sin(Date.now() * 0.001) * 0.02;
   sunGlow.scale.setScalar(pulse);
+
+  if (focusing && focusData) {
+    focusOnObject(focusData);
+  }
 
   controls.update();
   renderer.render(scene, camera);
