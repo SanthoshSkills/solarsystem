@@ -105,7 +105,7 @@
         transform: translateY(-20px);
       }
 
-      #planet-name {
+      #planet-name, #moon-name {
         font-size: 1.5rem;
         margin: 0;
         color: #fff;
@@ -171,7 +171,7 @@
         font-size: 0.95rem;
       }
 
-      #planet-fun-fact {
+      #planet-fun-fact, #moon-fun-fact {
         font-style: italic;
         font-size: 0.85rem;
         margin: 1rem 0;
@@ -181,11 +181,33 @@
         border-radius: 4px;
       }
 
-      #planet-description {
+      #planet-description, #moon-description {
         font-size: 0.85rem;
         line-height: 1.6;
         color: var(--text-secondary);
         margin-bottom: 1rem;
+      }
+
+      #moon-info {
+        width: 380px;
+        position: fixed;
+        top: 2rem;
+        right: calc(2rem + 400px);
+        z-index: 9998;
+        transition: opacity 0.3s ease-out, transform 0.3s ease-out;
+        opacity: 0;
+        pointer-events: none;
+        transform: translateY(-20px);
+      }
+
+      .moon-link {
+        cursor: pointer;
+        color: var(--accent-color);
+        text-decoration: underline;
+        transition: color 0.2s;
+      }
+      .moon-link:hover {
+        color: #ffffff;
       }
 
       .toggle-container {
@@ -314,6 +336,22 @@
               <span class="label">Velocity</span>
               <span id="planet-velocity" class="value">-</span>
             </div>
+            <div class="info-item">
+              <span class="label">Radius</span>
+              <span id="planet-radius-km" class="value">-</span>
+            </div>
+            <div class="info-item">
+              <span class="label">Orbital Period</span>
+              <span id="planet-orbital-period" class="value">-</span>
+            </div>
+            <div class="info-item">
+              <span class="label">Day Length</span>
+              <span id="planet-day-length" class="value">-</span>
+            </div>
+            <div class="info-item">
+              <span class="label">Moons Count</span>
+              <span id="planet-moons-count" class="value">-</span>
+            </div>
           </div>
           <div class="info-item" style="margin-bottom: 1rem;">
             <span class="label">Major Moons</span>
@@ -324,14 +362,64 @@
           <button id="close-info">Close</button>
         </div>
 
+        <div id="moon-info" class="glass-panel">
+          <div class="nav-header">
+            <button id="prev-moon-btn" class="nav-btn" title="Previous Moon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+            </button>
+            <h2 id="moon-name">Moon Name</h2>
+            <button id="next-moon-btn" class="nav-btn" title="Next Moon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+            </button>
+          </div>
+          <div class="info-grid">
+            <div class="info-item">
+              <span class="label">Mass</span>
+              <span id="moon-mass" class="value">-</span>
+            </div>
+            <div class="info-item">
+              <span class="label">Gravity</span>
+              <span id="moon-gravity" class="value">-</span>
+            </div>
+            <div class="info-item">
+              <span class="label">Temperature</span>
+              <span id="moon-temp" class="value">-</span>
+            </div>
+            <div class="info-item">
+              <span class="label">Radius</span>
+              <span id="moon-radius-km" class="value">-</span>
+            </div>
+            <div class="info-item">
+              <span class="label">Orbital Period</span>
+              <span id="moon-orbital-period" class="value">-</span>
+            </div>
+            <div class="info-item">
+              <span class="label">Day Length</span>
+              <span id="moon-day-length" class="value">-</span>
+            </div>
+          </div>
+          <p id="moon-fun-fact"></p>
+          <p id="moon-description"></p>
+          <button id="close-moon-info">Close Moon Info</button>
+        </div>
+
         <div id="controls-hint">
           <p>🖱️ Left Click: Rotate | ↔️ Right Click: Pan | 🔍 Scroll: Zoom</p>
-          <div class="toggle-container">
-            <label class="switch">
-              <input type="checkbox" id="toggle-moons" checked>
-              <span class="slider round"></span>
-            </label>
-            <span>Show Moons</span>
+          <div style="display: flex; gap: 2rem; justify-content: center; margin-top: 10px;">
+            <div class="toggle-container" style="margin-top: 0;">
+              <label class="switch">
+                <input type="checkbox" id="toggle-moons" checked>
+                <span class="slider round"></span>
+              </label>
+              <span>Show Moons</span>
+            </div>
+            <div class="toggle-container" id="moon-info-toggle-container" style="display: none; margin-top: 0;">
+              <label class="switch">
+                <input type="checkbox" id="toggle-moon-info">
+                <span class="slider round"></span>
+              </label>
+              <span>Show moon info</span>
+            </div>
           </div>
         </div>
       </div>

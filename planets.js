@@ -10,6 +10,10 @@ export const planetsData = [
     mass: "3.28e23 kg",
     gravity: "3.7 m/s²",
     temp: "167°C",
+    radiusKm: "2,439.7 km",
+    orbitalPeriod: "88 Earth days",
+    dayLength: "59 Earth days",
+    moonsCount: 0,
     funFact: "Mercury is shrinking as its iron core cools.",
     description: "The smallest planet in our solar system and closest to the Sun."
   },
@@ -24,6 +28,10 @@ export const planetsData = [
     mass: "4.86e24 kg",
     gravity: "8.8 m/s²",
     temp: "464°C",
+    radiusKm: "6,051.8 km",
+    orbitalPeriod: "225 Earth days",
+    dayLength: "243 Earth days",
+    moonsCount: 0,
     funFact: "A day on Venus is longer than a year.",
     description: "Spinning slowly in the opposite direction from most planets."
   },
@@ -38,10 +46,14 @@ export const planetsData = [
     mass: "5.97e24 kg",
     gravity: "9.8 m/s²",
     temp: "15°C",
+    radiusKm: "6,371 km",
+    orbitalPeriod: "365.25 days",
+    dayLength: "24 hours",
+    moonsCount: 1,
     funFact: "Earth is the only planet not named after a god.",
     description: "The only place we know of so far that's inhabited by living things.",
     moons: [
-      { name: "The Moon", radius: 0.45, distance: 3.5, speed: 0.05, texture: "/textures/moon.jpg" }
+      { name: "The Moon", radius: 0.45, distance: 3.5, speed: 0.05, texture: "/textures/moon.jpg", mass: "7.34e22 kg", gravity: "1.62 m/s²", temp: "-53°C", radiusKm: "1,737 km", orbitalPeriod: "27.3 Earth days", dayLength: "27.3 Earth days", funFact: "The Moon is drifting away from Earth at a rate of 3.8 cm per year.", description: "Earth's only natural satellite." }
     ]
   },
   {
@@ -55,11 +67,15 @@ export const planetsData = [
     mass: "6.39e23 kg",
     gravity: "3.7 m/s²",
     temp: "-65°C",
+    radiusKm: "3,389.5 km",
+    orbitalPeriod: "687 Earth days",
+    dayLength: "24h 37m",
+    moonsCount: 2,
     funFact: "Mars has the tallest volcano in the solar system, Olympus Mons.",
     description: "A dusty, cold, desert world with a very thin atmosphere.",
     moons: [
-      { name: "Phobos", radius: 0.2, distance: 2.2, speed: 0.08, color: "#8B4513" },
-      { name: "Deimos", radius: 0.15, distance: 3.0, speed: 0.06, color: "#A0522D" }
+      { name: "Phobos", radius: 0.2, distance: 2.2, speed: 0.08, color: "#8B4513", mass: "1.06e16 kg", gravity: "0.005 m/s²", temp: "-40°C", radiusKm: "11.2 km", orbitalPeriod: "8 hours", dayLength: "8 hours", funFact: "Phobos is slowly spiraling inward toward Mars.", description: "The larger, innermost moon of Mars." },
+      { name: "Deimos", radius: 0.15, distance: 3.0, speed: 0.06, color: "#A0522D", mass: "1.47e15 kg", gravity: "0.003 m/s²", temp: "-40°C", radiusKm: "6.2 km", orbitalPeriod: "30.3 hours", dayLength: "30.3 hours", funFact: "Deimos is irregularly shaped and highly cratered.", description: "The smaller, outermost moon of Mars." }
     ]
   },
   {
@@ -72,6 +88,10 @@ export const planetsData = [
     mass: "9.39e20 kg",
     gravity: "0.27 m/s²",
     temp: "-105°C",
+    radiusKm: "476 km",
+    orbitalPeriod: "4.6 Earth years",
+    dayLength: "9 hours",
+    moonsCount: 0,
     funFact: "Ceres makes up one-third of the total mass in the asteroid belt.",
     description: "The largest object in the asteroid belt between Mars and Jupiter."
   },
@@ -86,14 +106,18 @@ export const planetsData = [
     mass: "1.89e27 kg",
     gravity: "24.7 m/s²",
     temp: "-110°C",
+    radiusKm: "69,911 km",
+    orbitalPeriod: "12 Earth years",
+    dayLength: "10 hours",
+    moonsCount: 95,
     funFact: "Jupiter has a 'Great Red Spot' that has been raging for 300 years.",
     description: "More than twice as massive as all other planets combined.",
     moons: [
-      { name: "Io", radius: 0.4, distance: 7, speed: 0.06, color: "#EBE334" },
-      { name: "Europa", radius: 0.35, distance: 9, speed: 0.045, color: "#D7D7D7" },
-      { name: "Ganymede", radius: 0.5, distance: 11, speed: 0.035, color: "#9D9384" },
-      { name: "Callisto", radius: 0.48, distance: 13, speed: 0.025, color: "#7F7362" },
-      { name: "Amalthea", radius: 0.25, distance: 5, speed: 0.08, color: "#C04000" }
+      { name: "Io", radius: 0.4, distance: 7, speed: 0.06, color: "#EBE334", mass: "8.93e22 kg", gravity: "1.79 m/s²", temp: "-130°C", radiusKm: "1,821 km", orbitalPeriod: "1.77 Earth days", dayLength: "1.77 Earth days", funFact: "Io is the most geologically active object in the solar system.", description: "The innermost of the four Galilean moons of Jupiter." },
+      { name: "Europa", radius: 0.35, distance: 9, speed: 0.045, color: "#D7D7D7", mass: "4.8e22 kg", gravity: "1.31 m/s²", temp: "-160°C", radiusKm: "1,560 km", orbitalPeriod: "3.55 Earth days", dayLength: "3.55 Earth days", funFact: "Europa has a subsurface ocean that may harbor life.", description: "The smallest of the four Galilean moons orbiting Jupiter." },
+      { name: "Ganymede", radius: 0.5, distance: 11, speed: 0.035, color: "#9D9384", mass: "1.48e23 kg", gravity: "1.42 m/s²", temp: "-163°C", radiusKm: "2,634 km", orbitalPeriod: "7.15 Earth days", dayLength: "7.15 Earth days", funFact: "Ganymede is the largest moon in the solar system.", description: "The largest and most massive moon of Jupiter." },
+      { name: "Callisto", radius: 0.48, distance: 13, speed: 0.025, color: "#7F7362", mass: "1.07e23 kg", gravity: "1.23 m/s²", temp: "-139°C", radiusKm: "2,410 km", orbitalPeriod: "16.7 Earth days", dayLength: "16.7 Earth days", funFact: "Callisto has the most heavily cratered surface in the solar system.", description: "The second-largest moon of Jupiter." },
+      { name: "Amalthea", radius: 0.25, distance: 5, speed: 0.08, color: "#C04000", mass: "2.08e18 kg", gravity: "0.02 m/s²", temp: "-150°C", radiusKm: "83.5 km", orbitalPeriod: "0.5 Earth days", dayLength: "0.5 Earth days", funFact: "Amalthea radiates more heat than it receives from the Sun.", description: "A small, irregularly shaped inner moon of Jupiter." }
     ]
   },
   {
@@ -107,17 +131,21 @@ export const planetsData = [
     mass: "5.68e26 kg",
     gravity: "10.4 m/s²",
     temp: "-140°C",
+    radiusKm: "58,232 km",
+    orbitalPeriod: "29.4 Earth years",
+    dayLength: "10.7 hours",
+    moonsCount: 146,
     funFact: "Saturn's rings are made mostly of ice and dust.",
     description: "Unique in our solar system for its dazzling, complex rings.",
     hasRings: true,
     moons: [
-      { name: "Mimas", radius: 0.25, distance: 6, speed: 0.05, color: "#C0C0C0" },
-      { name: "Enceladus", radius: 0.28, distance: 7.5, speed: 0.04, color: "#FFFFFF" },
-      { name: "Tethys", radius: 0.35, distance: 9.5, speed: 0.035, color: "#D3D3D3" },
-      { name: "Dione", radius: 0.35, distance: 11, speed: 0.03, color: "#DCDCDC" },
-      { name: "Rhea", radius: 0.4, distance: 13.5, speed: 0.025, color: "#F5F5F5" },
-      { name: "Titan", radius: 0.65, distance: 17, speed: 0.02, color: "#DBB141" },
-      { name: "Iapetus", radius: 0.38, distance: 22, speed: 0.015, color: "#9C9C9C" }
+      { name: "Mimas", radius: 0.25, distance: 6, speed: 0.05, color: "#C0C0C0", mass: "3.7e19 kg", gravity: "0.06 m/s²", temp: "-209°C", radiusKm: "198 km", orbitalPeriod: "22.6 hours", dayLength: "22.6 hours", funFact: "Mimas has a huge crater making it look like the Death Star.", description: "The smallest astronomical body known to be rounded by its own gravity." },
+      { name: "Enceladus", radius: 0.28, distance: 7.5, speed: 0.04, color: "#FFFFFF", mass: "1.08e20 kg", gravity: "0.11 m/s²", temp: "-201°C", radiusKm: "252 km", orbitalPeriod: "32.9 hours", dayLength: "32.9 hours", funFact: "Enceladus shoots geysers of water ice into space.", description: "The sixth-largest moon of Saturn, mostly covered by clean ice." },
+      { name: "Tethys", radius: 0.35, distance: 9.5, speed: 0.035, color: "#D3D3D3", mass: "6.17e20 kg", gravity: "0.14 m/s²", temp: "-187°C", radiusKm: "531 km", orbitalPeriod: "45.3 hours", dayLength: "45.3 hours", funFact: "Tethys has a massive trench called Ithaca Chasma.", description: "A mid-sized moon of Saturn." },
+      { name: "Dione", radius: 0.35, distance: 11, speed: 0.03, color: "#DCDCDC", mass: "1.09e21 kg", gravity: "0.23 m/s²", temp: "-186°C", radiusKm: "561 km", orbitalPeriod: "2.73 Earth days", dayLength: "2.73 Earth days", funFact: "Dione has bright ice cliffs created by tectonic fractures.", description: "The fourth-largest moon of Saturn." },
+      { name: "Rhea", radius: 0.4, distance: 13.5, speed: 0.025, color: "#F5F5F5", mass: "2.3e21 kg", gravity: "0.26 m/s²", temp: "-174°C", radiusKm: "763 km", orbitalPeriod: "4.51 Earth days", dayLength: "4.51 Earth days", funFact: "Rhea constitutes Saturn's second-largest moon and is heavily cratered.", description: "The ninth-largest moon in the Solar System." },
+      { name: "Titan", radius: 0.65, distance: 17, speed: 0.02, color: "#DBB141", mass: "1.34e23 kg", gravity: "1.35 m/s²", temp: "-179°C", radiusKm: "2,574 km", orbitalPeriod: "15.9 Earth days", dayLength: "15.9 Earth days", funFact: "Titan is the only moon known to have a dense atmosphere.", description: "The largest moon of Saturn." },
+      { name: "Iapetus", radius: 0.38, distance: 22, speed: 0.015, color: "#9C9C9C", mass: "1.8e21 kg", gravity: "0.22 m/s²", temp: "-113°C", radiusKm: "734 km", orbitalPeriod: "79.3 Earth days", dayLength: "79.3 Earth days", funFact: "Iapetus is 'two-faced'—one side is bright, the other dark.", description: "The third-largest natural satellite of Saturn." }
     ]
   },
   {
@@ -131,14 +159,18 @@ export const planetsData = [
     mass: "8.68e25 kg",
     gravity: "8.6 m/s²",
     temp: "-195°C",
+    radiusKm: "25,362 km",
+    orbitalPeriod: "84 Earth years",
+    dayLength: "17 hours",
+    moonsCount: 28,
     funFact: "Uranus rotates on its side, nearly 90 degrees from the plane of its orbit.",
     description: "The first planet found with the aid of a telescope.",
     moons: [
-      { name: "Miranda", radius: 0.2, distance: 5, speed: 0.04, color: "#D3D3D3" },
-      { name: "Ariel", radius: 0.3, distance: 7, speed: 0.03, color: "#E0E0E0" },
-      { name: "Umbriel", radius: 0.3, distance: 9, speed: 0.025, color: "#9E9E9E" },
-      { name: "Titania", radius: 0.4, distance: 12, speed: 0.02, color: "#BDBDBD" },
-      { name: "Oberon", radius: 0.4, distance: 15, speed: 0.015, color: "#A9A9A9" }
+      { name: "Miranda", radius: 0.2, distance: 5, speed: 0.04, color: "#D3D3D3", mass: "6.59e19 kg", gravity: "0.08 m/s²", temp: "-187°C", radiusKm: "235 km", orbitalPeriod: "1.41 Earth days", dayLength: "1.41 Earth days", funFact: "Miranda has the most varied surface of all Uranus' moons.", description: "The smallest and innermost of Uranus' five major moons." },
+      { name: "Ariel", radius: 0.3, distance: 7, speed: 0.03, color: "#E0E0E0", mass: "1.35e21 kg", gravity: "0.27 m/s²", temp: "-205°C", radiusKm: "578 km", orbitalPeriod: "2.52 Earth days", dayLength: "2.52 Earth days", funFact: "Ariel has the brightest surface of Uranus' major moons.", description: "The fourth-largest of the 28 known moons of Uranus." },
+      { name: "Umbriel", radius: 0.3, distance: 9, speed: 0.025, color: "#9E9E9E", mass: "1.27e21 kg", gravity: "0.2 m/s²", temp: "-205°C", radiusKm: "584 km", orbitalPeriod: "4.14 Earth days", dayLength: "4.14 Earth days", funFact: "Umbriel has the darkest surface of Uranus' major moons.", description: "A major moon of Uranus discovered in 1851." },
+      { name: "Titania", radius: 0.4, distance: 12, speed: 0.02, color: "#BDBDBD", mass: "3.4e21 kg", gravity: "0.38 m/s²", temp: "-203°C", radiusKm: "788 km", orbitalPeriod: "8.7 Earth days", dayLength: "8.7 Earth days", funFact: "Titania is cut by a huge system of canyons.", description: "The largest of the moons of Uranus." },
+      { name: "Oberon", radius: 0.4, distance: 15, speed: 0.015, color: "#A9A9A9", mass: "3.08e21 kg", gravity: "0.34 m/s²", temp: "-203°C", radiusKm: "761 km", orbitalPeriod: "13.46 Earth days", dayLength: "13.46 Earth days", funFact: "Oberon is the outermost major moon of Uranus.", description: "The second-largest and second most massive of the Uranian moons." }
     ]
   },
   {
@@ -152,11 +184,15 @@ export const planetsData = [
     mass: "1.02e26 kg",
     gravity: "11.1 m/s²",
     temp: "-201°C",
+    radiusKm: "24,622 km",
+    orbitalPeriod: "165 Earth years",
+    dayLength: "16 hours",
+    moonsCount: 16,
     funFact: "Neptune was the first planet predicted by mathematical calculations.",
     description: "Dark, cold, and whipped by supersonic winds.",
     moons: [
-      { name: "Proteus", radius: 0.3, distance: 6, speed: 0.03, color: "#708090" },
-      { name: "Triton", radius: 0.55, distance: 10, speed: 0.02, color: "#E6E6FA" }
+      { name: "Proteus", radius: 0.3, distance: 6, speed: 0.03, color: "#708090", mass: "4.4e19 kg", gravity: "0.07 m/s²", temp: "-222°C", radiusKm: "210 km", orbitalPeriod: "26.9 hours", dayLength: "26.9 hours", funFact: "Proteus is the largest irregularly shaped moon in the solar system.", description: "The second-largest Neptunian moon." },
+      { name: "Triton", radius: 0.55, distance: 10, speed: 0.02, color: "#E6E6FA", mass: "2.14e22 kg", gravity: "0.78 m/s²", temp: "-235°C", radiusKm: "1,353 km", orbitalPeriod: "5.87 Earth days", dayLength: "5.87 Earth days", funFact: "Triton orbits Neptune in the opposite direction of the planet's rotation.", description: "The largest natural satellite of the planet Neptune." }
     ]
   },
   {
@@ -170,10 +206,14 @@ export const planetsData = [
     mass: "1.30e22 kg",
     gravity: "0.62 m/s²",
     temp: "-225°C",
+    radiusKm: "1,188 km",
+    orbitalPeriod: "248 Earth years",
+    dayLength: "153 hours",
+    moonsCount: 5,
     funFact: "Pluto is smaller than Earth's moon.",
     description: "Once the ninth planet, now a complex dwarf planet in the Kuiper Belt.",
     moons: [
-      { name: "Charon", radius: 0.35, distance: 4, speed: 0.04, color: "#778899" }
+      { name: "Charon", radius: 0.35, distance: 4, speed: 0.04, color: "#778899", mass: "1.58e21 kg", gravity: "0.28 m/s²", temp: "-230°C", radiusKm: "606 km", orbitalPeriod: "6.38 Earth days", dayLength: "6.38 Earth days", funFact: "Charon and Pluto orbit a common center of mass, making them a binary system.", description: "The largest of the five known natural satellites of the dwarf planet Pluto." }
     ]
   },
   {
@@ -186,6 +226,10 @@ export const planetsData = [
     mass: "4.0e21 kg",
     gravity: "0.4 m/s²",
     temp: "-241°C",
+    radiusKm: "816 km",
+    orbitalPeriod: "284 Earth years",
+    dayLength: "3.9 hours",
+    moonsCount: 2,
     funFact: "Haumea is egg-shaped due to its extremely fast rotation.",
     description: "A fast-rotating dwarf planet in the Kuiper Belt."
   },
@@ -199,6 +243,10 @@ export const planetsData = [
     mass: "3.1e21 kg",
     gravity: "0.5 m/s²",
     temp: "-243°C",
+    radiusKm: "715 km",
+    orbitalPeriod: "305 Earth years",
+    dayLength: "22.8 hours",
+    moonsCount: 1,
     funFact: "Makemake has no known atmosphere and is extremely cold.",
     description: "The second largest Kuiper Belt object."
   },
@@ -212,6 +260,10 @@ export const planetsData = [
     mass: "1.66e22 kg",
     gravity: "0.82 m/s²",
     temp: "-243°C",
+    radiusKm: "1,163 km",
+    orbitalPeriod: "558 Earth years",
+    dayLength: "25.9 hours",
+    moonsCount: 1,
     funFact: "Eris is almost the same size as Pluto but more massive.",
     description: "The most massive dwarf planet known."
   }
@@ -225,6 +277,10 @@ export const sunData = {
   mass: "1.98e30 kg",
   gravity: "274 m/s²",
   temp: "5,505°C",
+  radiusKm: "696,340 km",
+  orbitalPeriod: "230M years",
+  dayLength: "27 Earth days",
+  moonsCount: 0,
   funFact: "The Sun accounts for 99.86% of the total mass in the solar system.",
   description: "A nearly perfect sphere of hot plasma at the center."
 };

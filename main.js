@@ -221,12 +221,44 @@ const planetMass = document.getElementById('planet-mass');
 const planetGrav = document.getElementById('planet-gravity');
 const planetTemp = document.getElementById('planet-temp');
 const planetVel = document.getElementById('planet-velocity');
+const planetRadiusKm = document.getElementById('planet-radius-km');
+const planetOrbitalPeriod = document.getElementById('planet-orbital-period');
+const planetDayLength = document.getElementById('planet-day-length');
+const planetMoonsCount = document.getElementById('planet-moons-count');
 const planetFact = document.getElementById('planet-fun-fact');
 const planetDesc = document.getElementById('planet-description');
 
 // Navigation List
 const navList = [sunData, ...planetsData];
 let currentNavIndex = -1;
+
+// Moon Subpanel State
+const allMoons = [];
+planetsData.forEach(p => {
+  if (p.moons) {
+    p.moons.forEach(m => {
+      allMoons.push({ moon: m, planet: p });
+    });
+  }
+});
+let globalMoonNavIndex = -1;
+let isGlobalMoonMode = false;
+let currentPlanetMoons = [];
+let localMoonNavIndex = -1;
+
+const moonInfo = document.getElementById('moon-info');
+const moonName = document.getElementById('moon-name');
+const moonMass = document.getElementById('moon-mass');
+const moonGrav = document.getElementById('moon-gravity');
+const moonTemp = document.getElementById('moon-temp');
+const moonRadiusKm = document.getElementById('moon-radius-km');
+const moonOrbitalPeriod = document.getElementById('moon-orbital-period');
+const moonDayLength = document.getElementById('moon-day-length');
+const moonFact = document.getElementById('moon-fun-fact');
+const moonDesc = document.getElementById('moon-description');
+
+const toggleMoonInfo = document.getElementById('toggle-moon-info');
+const moonInfoToggleContainer = document.getElementById('moon-info-toggle-container');
 
 // Interaction targets
 let interactionTargets = [sun, ...planets.map(p => p.mesh)];
@@ -243,7 +275,30 @@ updateTargets();
 function getObjectByName(name) {
   if (name === "Sun") return sun;
   const pObj = planets.find(p => p.data.name === name);
-  return pObj ? pObj.mesh : null;
+  if (pObj) return pObj.mesh;
+  for (let p of planets) {
+    const mObj = p.moons.find(m => m.data.name === name);
+    if (mObj) return mObj.mesh;
+  }
+  return null;
+}
+
+moonInfoToggleContainer.style.display = showMoons ? 'block' : 'none';
+
+function navigateToGlobalMoon(index) {
+  if(index < 0 || index >= allMoons.length) return;
+  const item = allMoons[index];
+  showMoonInfo(item.moon);
+  
+  // Keep focus on the planet level
+  const parentPlanetMesh = getObjectByName(item.planet.name);
+  if (parentPlanetMesh) {
+    pinnedObject = parentPlanetMesh;
+    currentNavIndex = navList.findIndex(b => b.name === item.planet.name);
+    focusing = true;
+    focusData = item.planet;
+    showInfo(item.planet);
+  }
 }
 
 function focusOnObject(data) {
@@ -256,7 +311,7 @@ function focusOnObject(data) {
     controls.target.lerp(targetPos, 0.1);
     
     // Adjust camera distance based on object size
-    const distance = data.radius * 5 + 20;
+    const distance = (data.radius || 1) * 5 + 20;
     const direction = camera.position.clone().sub(controls.target).normalize();
     const newPos = targetPos.clone().add(direction.multiplyScalar(distance));
     camera.position.lerp(newPos, 0.05);
@@ -279,7 +334,14 @@ window.addEventListener('mousemove', (event) => {
     if (hoveredObject !== object) {
       hoveredObject = object;
       console.log('Interaction Hit:', object.userData.name);
-      if (!pinnedObject) showInfo(object.userData);
+      if (!pinnedObject) {
+         if(object.userData.parentName) {
+            let parentPlanet = navList.find(p => p.name === object.userData.parentName);
+            if(parentPlanet) showInfo(parentPlanet);
+         } else {
+            showInfo(object.userData);
+         }
+      }
     }
     document.body.style.cursor = 'pointer';
   } else {
@@ -293,13 +355,41 @@ window.addEventListener('mousemove', (event) => {
   }
 });
 
-window.addEventListener('click', () => {
+window.addEventListener('click', (event) => {
   if (hoveredObject) {
-    pinnedObject = hoveredObject;
-    currentNavIndex = navList.findIndex(b => b.name === pinnedObject.userData.name);
-    showInfo(hoveredObject.userData);
-    focusing = true;
-    focusData = hoveredObject.userData;
+    if (hoveredObject.userData.parentName) {
+      // Clicked a moon
+      let parentPlanet = navList.find(p => p.name === hoveredObject.userData.parentName);
+      
+      if(showMoons) {
+         isGlobalMoonMode = false;
+         currentPlanetMoons = parentPlanet.moons;
+         localMoonNavIndex = currentPlanetMoons.findIndex(m => m.name === hoveredObject.userData.name);
+         
+         pinnedObject = getObjectByName(parentPlanet.name);
+         currentNavIndex = navList.findIndex(b => b.name === parentPlanet.name);
+         focusing = true;
+         focusData = parentPlanet;
+         showInfo(parentPlanet);
+
+         toggleMoonInfo.checked = true;
+         showMoonInfo(hoveredObject.userData);
+      } else {
+         // just focus planet if moons are hidden
+         pinnedObject = getObjectByName(parentPlanet.name);
+         currentNavIndex = navList.findIndex(b => b.name === parentPlanet.name);
+         focusing = true;
+         focusData = parentPlanet;
+         showInfo(parentPlanet);
+      }
+    } else {
+      // Clicked a planet or sun
+      pinnedObject = hoveredObject;
+      currentNavIndex = navList.findIndex(b => b.name === pinnedObject.userData.name);
+      showInfo(hoveredObject.userData);
+      focusing = true;
+      focusData = hoveredObject.userData;
+    }
   } else {
     // Only clear if clicking background, not UI
     if (event.target === canvas) {
@@ -308,6 +398,9 @@ window.addEventListener('click', () => {
       planetInfo.style.opacity = '0';
       planetInfo.style.pointerEvents = 'none';
       planetInfo.style.transform = 'translateY(-20px)';
+      hideMoonInfo();
+      toggleMoonInfo.checked = false;
+      moonInfoToggleContainer.style.display = 'none';
     }
   }
 });
@@ -318,12 +411,34 @@ function showInfo(data) {
   planetGrav.innerText = data.gravity || 'N/A';
   planetTemp.innerText = data.temp || 'N/A';
   planetVel.innerText = data.speed ? `${(data.speed * 1000).toFixed(2)} km/s` : 'N/A';
+  if(planetRadiusKm) planetRadiusKm.innerText = data.radiusKm || 'N/A';
+  if(planetOrbitalPeriod) planetOrbitalPeriod.innerText = data.orbitalPeriod || 'N/A';
+  if(planetDayLength) planetDayLength.innerText = data.dayLength || 'N/A';
+  if(planetMoonsCount) planetMoonsCount.innerText = data.moonsCount !== undefined ? data.moonsCount : (data.moons ? data.moons.length : 0);
   planetFact.innerText = data.funFact || 'Exploring the unknown...';
   planetDesc.innerText = data.description || '';
   
   const moonsList = document.getElementById('planet-moons-list');
   if (data.moons && data.moons.length > 0) {
-    moonsList.innerText = data.moons.map(m => m.name).join(', ');
+    moonsList.innerHTML = '';
+    data.moons.forEach((m, idx) => {
+      const span = document.createElement('span');
+      span.innerText = m.name;
+      span.className = 'moon-link';
+      span.onclick = (e) => {
+        e.stopPropagation();
+        if(!showMoons) return;
+        isGlobalMoonMode = false;
+        currentPlanetMoons = data.moons;
+        localMoonNavIndex = idx;
+        toggleMoonInfo.checked = true;
+        showMoonInfo(m);
+      };
+      moonsList.appendChild(span);
+      if(idx < data.moons.length - 1) {
+        moonsList.appendChild(document.createTextNode(', '));
+      }
+    });
   } else {
     moonsList.innerText = 'None';
   }
@@ -331,6 +446,29 @@ function showInfo(data) {
   planetInfo.style.opacity = '1';
   planetInfo.style.pointerEvents = 'auto';
   planetInfo.style.transform = 'none';
+}
+
+function showMoonInfo(moonData) {
+  moonName.innerText = moonData.name;
+  moonMass.innerText = moonData.mass || 'N/A';
+  moonGrav.innerText = moonData.gravity || 'N/A';
+  moonTemp.innerText = moonData.temp || 'N/A';
+  moonRadiusKm.innerText = moonData.radiusKm || 'N/A';
+  moonOrbitalPeriod.innerText = moonData.orbitalPeriod || 'N/A';
+  moonDayLength.innerText = moonData.dayLength || 'N/A';
+  moonFact.innerText = moonData.funFact || 'Exploring the unknown...';
+  moonDesc.innerText = moonData.description || '';
+
+  moonInfo.style.opacity = '1';
+  moonInfo.style.pointerEvents = 'auto';
+  moonInfo.style.transform = 'none';
+  toggleMoonInfo.checked = true;
+}
+
+function hideMoonInfo() {
+  moonInfo.style.opacity = '0';
+  moonInfo.style.pointerEvents = 'none';
+  moonInfo.style.transform = 'translateY(-20px)';
 }
 
 // Navigation Listeners
@@ -364,6 +502,57 @@ document.getElementById('close-info').addEventListener('click', () => {
   planetInfo.style.opacity = '0';
   planetInfo.style.pointerEvents = 'none';
   planetInfo.style.transform = 'translateY(-20px)';
+  hideMoonInfo();
+  toggleMoonInfo.checked = false;
+  moonInfoToggleContainer.style.display = 'none';
+});
+
+document.getElementById('close-moon-info').addEventListener('click', () => {
+  hideMoonInfo();
+  toggleMoonInfo.checked = false;
+});
+
+document.getElementById('prev-moon-btn').addEventListener('click', (e) => {
+  e.stopPropagation();
+  if (isGlobalMoonMode) {
+    if(!allMoons.length) return;
+    globalMoonNavIndex = (globalMoonNavIndex - 1 + allMoons.length) % allMoons.length;
+    navigateToGlobalMoon(globalMoonNavIndex);
+  } else {
+    if(!currentPlanetMoons.length) return;
+    localMoonNavIndex = (localMoonNavIndex - 1 + currentPlanetMoons.length) % currentPlanetMoons.length;
+    showMoonInfo(currentPlanetMoons[localMoonNavIndex]);
+  }
+});
+
+document.getElementById('next-moon-btn').addEventListener('click', (e) => {
+  e.stopPropagation();
+  if (isGlobalMoonMode) {
+    if(!allMoons.length) return;
+    globalMoonNavIndex = (globalMoonNavIndex + 1) % allMoons.length;
+    navigateToGlobalMoon(globalMoonNavIndex);
+  } else {
+    if(!currentPlanetMoons.length) return;
+    localMoonNavIndex = (localMoonNavIndex + 1) % currentPlanetMoons.length;
+    showMoonInfo(currentPlanetMoons[localMoonNavIndex]);
+  }
+});
+
+toggleMoonInfo.addEventListener('change', (e) => {
+  if (e.target.checked && allMoons.length > 0) {
+    isGlobalMoonMode = true;
+    if(globalMoonNavIndex < 0 || globalMoonNavIndex >= allMoons.length) globalMoonNavIndex = 0;
+    
+    if (pinnedObject && pinnedObject.userData && pinnedObject.userData.moons && pinnedObject.userData.moons.length > 0) {
+      const parentName = pinnedObject.userData.name;
+      const idx = allMoons.findIndex(item => item.planet.name === parentName);
+      if(idx !== -1) globalMoonNavIndex = idx;
+    }
+    
+    navigateToGlobalMoon(globalMoonNavIndex);
+  } else {
+    hideMoonInfo();
+  }
 });
 
 // Moon Toggle Logic
@@ -375,6 +564,12 @@ document.getElementById('toggle-moons').addEventListener('change', (e) => {
     });
   });
   updateTargets();
+  
+  moonInfoToggleContainer.style.display = showMoons ? 'block' : 'none';
+  if (!showMoons) {
+    hideMoonInfo();
+    toggleMoonInfo.checked = false;
+  }
 });
 
 // --- Controls ---
