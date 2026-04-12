@@ -408,6 +408,10 @@ window.addEventListener('click', (event) => {
 });
 
 function showInfo(data) {
+  hideMoonInfo();
+  toggleMoonInfo.checked = false;
+  moonInfoToggleContainer.style.display = showMoons ? 'block' : 'none';
+
   planetName.innerText = data.name;
   planetMass.innerText = data.mass || 'N/A';
   planetGrav.innerText = data.gravity || 'N/A';
@@ -444,8 +448,6 @@ function showInfo(data) {
     });
   } else {
     moonsList.innerText = 'None';
-    hideMoonInfo();
-    toggleMoonInfo.checked = false;
   }
   
   planetInfo.style.opacity = '1';
