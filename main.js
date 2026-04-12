@@ -399,6 +399,9 @@ window.addEventListener('click', (event) => {
       planetInfo.style.opacity = '0';
       planetInfo.style.pointerEvents = 'none';
       planetInfo.style.transform = 'translateY(-20px)';
+      hideMoonInfo();
+      toggleMoonInfo.checked = false;
+      moonInfoToggleContainer.style.display = showMoons ? 'block' : 'none';
       resettingToDefault = true;
     }
   }
@@ -432,6 +435,7 @@ function showInfo(data) {
         localMoonNavIndex = idx;
         toggleMoonInfo.checked = true;
         showMoonInfo(m);
+        moonInfoToggleContainer.style.display = 'none';
       };
       moonsList.appendChild(span);
       if(idx < data.moons.length - 1) {
@@ -503,6 +507,9 @@ document.getElementById('close-info').addEventListener('click', () => {
   planetInfo.style.opacity = '0';
   planetInfo.style.pointerEvents = 'none';
   planetInfo.style.transform = 'translateY(-20px)';
+  hideMoonInfo();
+  toggleMoonInfo.checked = false;
+  moonInfoToggleContainer.style.display = showMoons ? 'block' : 'none';
   resettingToDefault = true;
 });
 
@@ -614,7 +621,8 @@ function animate() {
     resettingToDefault = false;
   } else if (resettingToDefault) {
     const defaultTarget = new THREE.Vector3(0, 0, 0);
-    const defaultCameraPos = new THREE.Vector3(0, 150, 450);
+    // View from just outside the Asteroid Belt (Radius 45-58)
+    const defaultCameraPos = new THREE.Vector3(0, 30, 80);
     
     controls.target.lerp(defaultTarget, 0.05);
     camera.position.lerp(defaultCameraPos, 0.05);
