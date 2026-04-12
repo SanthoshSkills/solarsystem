@@ -320,6 +320,7 @@ function focusOnObject(data) {
 
 let focusing = false;
 let focusData = null;
+let resettingToDefault = false;
 
 window.addEventListener('mousemove', (event) => {
   const rect = canvas.getBoundingClientRect();
@@ -398,9 +399,7 @@ window.addEventListener('click', (event) => {
       planetInfo.style.opacity = '0';
       planetInfo.style.pointerEvents = 'none';
       planetInfo.style.transform = 'translateY(-20px)';
-      hideMoonInfo();
-      toggleMoonInfo.checked = false;
-      moonInfoToggleContainer.style.display = 'none';
+      resettingToDefault = true;
     }
   }
 });
@@ -441,6 +440,8 @@ function showInfo(data) {
     });
   } else {
     moonsList.innerText = 'None';
+    hideMoonInfo();
+    toggleMoonInfo.checked = false;
   }
   
   planetInfo.style.opacity = '1';
@@ -502,9 +503,7 @@ document.getElementById('close-info').addEventListener('click', () => {
   planetInfo.style.opacity = '0';
   planetInfo.style.pointerEvents = 'none';
   planetInfo.style.transform = 'translateY(-20px)';
-  hideMoonInfo();
-  toggleMoonInfo.checked = false;
-  moonInfoToggleContainer.style.display = 'none';
+  resettingToDefault = true;
 });
 
 document.getElementById('close-moon-info').addEventListener('click', () => {
@@ -612,6 +611,17 @@ function animate() {
 
   if (focusing && focusData) {
     focusOnObject(focusData);
+    resettingToDefault = false;
+  } else if (resettingToDefault) {
+    const defaultTarget = new THREE.Vector3(0, 0, 0);
+    const defaultCameraPos = new THREE.Vector3(0, 150, 450);
+    
+    controls.target.lerp(defaultTarget, 0.05);
+    camera.position.lerp(defaultCameraPos, 0.05);
+    
+    if (controls.target.distanceTo(defaultTarget) < 0.1 && camera.position.distanceTo(defaultCameraPos) < 0.1) {
+      resettingToDefault = false;
+    }
   }
 
   controls.update();
