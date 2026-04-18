@@ -329,11 +329,12 @@ window.addEventListener('mousemove', (event) => {
   raycaster.setFromCamera(mouse, camera);
   const intersects = raycaster.intersectObjects(interactionTargets);
   
-  if (intersects.length > 0) {
-    const object = intersects[0].object;
+  const validHit = intersects.find(i => i.object.userData && i.object.userData.name);
+
+  if (validHit) {
+    const object = validHit.object;
     if (hoveredObject !== object) {
       hoveredObject = object;
-      console.log('Interaction Hit:', object.userData.name);
       if (!pinnedObject) {
          if(object.userData.parentName) {
             let parentPlanet = navList.find(p => p.name === object.userData.parentName);
@@ -357,7 +358,7 @@ window.addEventListener('mousemove', (event) => {
 });
 
 window.addEventListener('click', (event) => {
-  if (hoveredObject) {
+  if (hoveredObject && hoveredObject.userData && hoveredObject.userData.name) {
     if (hoveredObject.userData.parentName) {
       // Clicked a moon
       let parentPlanet = navList.find(p => p.name === hoveredObject.userData.parentName);
