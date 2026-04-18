@@ -404,7 +404,7 @@ window.addEventListener('click', (event) => {
 });
 
 function showInfo(data) {
-  hideMoonInfo();
+  const wasMoonInfoOpen = moonInfo.style.opacity === '1';
 
   planetName.innerText = data.name;
   planetMass.innerText = data.mass || 'N/A';
@@ -445,6 +445,15 @@ function showInfo(data) {
   planetInfo.style.opacity = '1';
   planetInfo.style.pointerEvents = 'auto';
   planetInfo.style.transform = 'none';
+
+  if (wasMoonInfoOpen && data.moons && data.moons.length > 0 && showMoons) {
+    isGlobalMoonMode = false;
+    currentPlanetMoons = data.moons;
+    localMoonNavIndex = 0;
+    showMoonInfo(data.moons[0]);
+  } else {
+    hideMoonInfo();
+  }
 }
 
 function showMoonInfo(moonData) {
