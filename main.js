@@ -8,6 +8,8 @@ const timeScale = 1;
 let hoveredObject = null;
 let pinnedObject = null;
 let showMoons = true;
+let targetViewOffsetX = 0;
+let currentViewOffsetX = 0;
 
 // --- Scene Setup ---
 const canvas = document.querySelector('#solar-canvas');
@@ -585,6 +587,23 @@ function animate() {
   const pulse = 1 + Math.sin(Date.now() * 0.001) * 0.02;
   sunGlow.scale.setScalar(pulse);
 
+  let uiOffset = 0;
+  if (focusing) {
+    uiOffset = window.innerWidth > 768 ? 200 : 0; // shift left if window is wide enough
+    if (moonInfo.style.opacity === '1') {
+      uiOffset = window.innerWidth > 1024 ? 400 : uiOffset;
+    }
+  }
+  targetViewOffsetX = uiOffset;
+
+  if (Math.abs(targetViewOffsetX - currentViewOffsetX) > 0.5) {
+    currentViewOffsetX += (targetViewOffsetX - currentViewOffsetX) * 0.1;
+    camera.setViewOffset(window.innerWidth, window.innerHeight, currentViewOffsetX, 0, window.innerWidth, window.innerHeight);
+  } else if (currentViewOffsetX !== 0 && targetViewOffsetX === 0) {
+    currentViewOffsetX = 0;
+    camera.clearViewOffset();
+  }
+
   if (focusing && focusData) {
     focusOnObject(focusData);
     resettingToDefault = false;
@@ -610,6 +629,11 @@ animate();
 // --- Responsive ---
 window.addEventListener('resize', () => {
   camera.aspect = window.innerWidth / window.innerHeight;
+  if (currentViewOffsetX > 0.5) {
+    camera.setViewOffset(window.innerWidth, window.innerHeight, currentViewOffsetX, 0, window.innerWidth, window.innerHeight);
+  } else {
+    camera.clearViewOffset();
+  }
   camera.updateProjectionMatrix();
   renderer.setSize(window.innerWidth, window.innerHeight);
 });
