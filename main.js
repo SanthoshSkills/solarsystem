@@ -390,17 +390,6 @@ window.addEventListener('click', (event) => {
       focusing = true;
       focusData = hoveredObject.userData;
     }
-  } else {
-    // Only clear if clicking background, not UI
-    if (event.target === canvas) {
-      pinnedObject = null;
-      focusing = false;
-      planetInfo.style.opacity = '0';
-      planetInfo.style.pointerEvents = 'none';
-      planetInfo.style.transform = 'translateY(-20px)';
-      hideMoonInfo();
-      resettingToDefault = true;
-    }
   }
 });
 
@@ -612,13 +601,13 @@ function animate() {
     resettingToDefault = false;
   } else if (resettingToDefault) {
     const defaultTarget = new THREE.Vector3(0, 0, 0);
-    // View from just outside the Asteroid Belt (Radius 45-58)
-    const defaultCameraPos = new THREE.Vector3(0, 30, 80);
+    // Full view of the entire solar system
+    const defaultCameraPos = new THREE.Vector3(0, 150, 450);
     
     controls.target.lerp(defaultTarget, 0.05);
     camera.position.lerp(defaultCameraPos, 0.05);
     
-    if (controls.target.distanceTo(defaultTarget) < 0.1 && camera.position.distanceTo(defaultCameraPos) < 0.1) {
+    if (controls.target.distanceTo(defaultTarget) < 0.1 && camera.position.distanceTo(defaultCameraPos) < 1.0) {
       resettingToDefault = false;
     }
   }
