@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>User Manual - Solar System Simulator</title>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap');
+
+      :root {
+        --bg-color: #050510;
+        --text-primary: #ffffff;
+        --text-secondary: rgba(255, 255, 255, 0.7);
+        --accent-color: #4a90e2;
+        --glass-bg: rgba(255, 255, 255, 0.05);
+        --glass-border: rgba(255, 255, 255, 0.1);
+        --glass-blur: blur(12px);
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: 'Outfit', sans-serif;
+        background-color: var(--bg-color);
+        background-image: radial-gradient(circle at 50% 0%, rgba(74, 144, 226, 0.15), transparent 50%);
+        color: var(--text-primary);
+        line-height: 1.6;
+        min-height: 100vh;
+        padding: 2rem;
+        display: flex;
+        justify-content: center;
+      }
+
+      .container {
+        max-width: 800px;
+        width: 100%;
+        background: var(--glass-bg);
+        backdrop-filter: var(--glass-blur);
+        -webkit-backdrop-filter: var(--glass-blur);
+        border: 1px solid var(--glass-border);
+        border-radius: 20px;
+        padding: 3rem;
+        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+      }
+
+      h1 {
+        font-weight: 600;
+        font-size: 2.5rem;
+        letter-spacing: -0.02em;
+        background: linear-gradient(to right, #ffffff, #4a90e2);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 2rem;
+        text-align: center;
+      }
+
+      h2 {
+        color: var(--accent-color);
+        margin-top: 2rem;
+        margin-bottom: 1rem;
+        font-size: 1.5rem;
+        border-bottom: 1px solid var(--glass-border);
+        padding-bottom: 0.5rem;
+      }
+
+      h3 {
+        color: #fff;
+        margin-top: 1.5rem;
+        margin-bottom: 0.5rem;
+        font-size: 1.2rem;
+      }
+
+      p {
+        color: var(--text-secondary);
+        margin-bottom: 1rem;
+      }
+
+      ul {
+        color: var(--text-secondary);
+        margin-bottom: 1rem;
+        padding-left: 1.5rem;
+      }
+
+      li {
+        margin-bottom: 0.5rem;
+      }
+
+      strong {
+        color: #fff;
+      }
+
+      .back-link {
+        display: inline-block;
+        margin-bottom: 2rem;
+        color: var(--accent-color);
+        text-decoration: none;
+        font-weight: 600;
+        background: rgba(255,255,255,0.05);
+        padding: 0.5rem 1rem;
+        border-radius: 12px;
+        border: 1px solid var(--glass-border);
+        transition: all 0.2s;
+      }
+
+      .back-link:hover {
+        background: rgba(255,255,255,0.1);
+        color: #fff;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <a href="/" class="back-link">← Back to Simulator</a>
+      
+      <h1>Solar System Simulator<br>User Manual</h1>
+      
+      <p>Welcome to the 3D Solar System Simulator! This application provides an interactive, detailed, and realistic 3D representation of our solar system right in your browser.</p>
+
+      <h2>Getting Started</h2>
+      <p>When you launch the simulator, you will initially be presented with a wide view of the entire solar system, centered on the Sun. The simulation is running in real-time, meaning planets are actively moving along their orbital paths based on relatively scaled speeds.</p>
+
+      <h2>Camera Controls</h2>
+      <p>Navigating the 3D space is intuitive and relies on your mouse:</p>
+      <ul>
+        <li><strong>Rotate View (Orbit):</strong> Click and hold the <strong>Left Mouse Button</strong> anywhere in the empty space, then drag to orbit the camera around the currently focused object or the center of the solar system.</li>
+        <li><strong>Pan Camera:</strong> Click and hold the <strong>Right Mouse Button</strong>, then drag to laterally move (pan) your camera perspective without rotating.</li>
+        <li><strong>Zoom In / Out:</strong> Use your <strong>Mouse Scroll Wheel</strong> to zoom closer to the celestial bodies or zoom out for a macro view of the solar system.</li>
+      </ul>
+
+      <h2>Interaction & Exploration</h2>
+      
+      <h3>Interacting with Planets and the Sun</h3>
+      <ul>
+        <li><strong>Hovering:</strong> If your view isn't currently locked to a planet, simply hovering your mouse cursor over any planet (or the Sun) will briefly highlight it and pop open the <strong>Planet Info Panel</strong>.</li>
+        <li><strong>Selecting (Pinning):</strong> To lock the camera onto a planet and track it through space, <strong>Left Click</strong> on it. 
+          <ul>
+            <li><em>Smart Camera Shift:</em> When a planet is selected and the information panel opens, the camera intelligently pans the planet slightly to the left portion of your screen so it remains clearly visible alongside the UI panel.</li>
+          </ul>
+        </li>
+        <li><strong>Deselecting:</strong> You can unlock your view by clicking the <strong>Close</strong> button at the bottom of the Planet Info Panel. This will safely close any open moon info panels and elegantly reset your camera back to a wide, cinematic viewpoint showcasing the entire solar system. Clicking on the empty background space will no longer accidentally unpin your camera.</li>
+      </ul>
+
+      <h3>Discovering Moons</h3>
+      <ul>
+        <li><strong>Moon Info Panel:</strong> If you select a planet that has moons (like Earth, Mars, Jupiter, etc.), the <strong>Moon Info Panel</strong> will open automatically by default, showcasing details about its most prominent moon.</li>
+        <li><strong>Selecting Specific Moons:</strong> Inside the Planet Info Panel, you will see a list of "Major Moons". You can click on any of these underlined names to instantly pull up its targeted data.</li>
+        <li><strong>Navigating Moons:</strong> While the Moon Info Panel is open, use the <strong>previous (&lt;)</strong> and <strong>next (&gt;)</strong> arrows at the top of the panel to cycle through all the major moons belonging to the currently selected planet.</li>
+      </ul>
+
+      <h3>Navigating the System</h3>
+      <ul>
+        <li>You don't have to manually locate everything! While the Planet Info Panel is open, you can use the <strong>previous (&lt;)</strong> and <strong>next (&gt;)</strong> arrow buttons on the panel header to cycle through the Sun and all the planets in order of their distance from the Sun.</li>
+        <li>The camera will automatically fly to and focus on the newly selected planet.</li>
+      </ul>
+
+      <h2>Visual Toggles</h2>
+      <ul>
+        <li><strong>Show Moons Switch:</strong> Located at the bottom center of your screen, this toggle allows you to hide or show the 3D models and orbits of the moons in the simulation. 
+          <ul>
+            <li><em>Note:</em> Turning this off purely removes the 3D meshes to declutter your screen. You can still access full moon data via the UI panels seamlessly!</li>
+          </ul>
+        </li>
+      </ul>
+
+      <h2>Understanding the Data</h2>
+      <p>The information panels provide a curated selection of properties for each celestial body, including:</p>
+      <ul>
+        <li>Mass & Gravity</li>
+        <li>Surface Temperature</li>
+        <li>Orbital Velocity & Period</li>
+        <li>Day Length</li>
+        <li>Equatorial Radius</li>
+        <li>Fun Facts & Descriptions</li>
+      </ul>
+
+      <p style="text-align: center; margin-top: 3rem; color: #fff; font-weight: 600;">Enjoy your journey through the cosmos!</p>
+    </div>
+  </body>
+</html>
