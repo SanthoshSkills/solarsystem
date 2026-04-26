@@ -19,11 +19,7 @@
         --glass-blur: blur(12px);
       }
 
-      * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-      }
+      * { margin: 0; padding: 0; box-sizing: border-box; }
 
       body {
         font-family: 'Outfit', sans-serif;
@@ -34,52 +30,32 @@
         height: 100vh;
       }
 
-      #app {
-        width: 100%;
-        height: 100%;
-        position: relative;
-      }
+      #app { width: 100%; height: 100%; position: relative; }
 
       #solar-canvas {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        z-index: 1;
+        position: absolute; top: 0; left: 0;
+        width: 100%; height: 100%; z-index: 1;
       }
 
       #ui-overlay {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        z-index: 2;
+        position: absolute; top: 0; left: 0;
+        width: 100%; height: 100%; z-index: 2;
         pointer-events: none;
-        display: flex;
-        flex-direction: column;
+        display: flex; flex-direction: column;
         justify-content: space-between;
         padding: 2rem;
       }
 
-      header {
-        pointer-events: auto;
-      }
+      header { pointer-events: auto; }
 
       header h1 {
-        font-weight: 600;
-        font-size: 2rem;
-        letter-spacing: -0.02em;
+        font-weight: 600; font-size: 2rem; letter-spacing: -0.02em;
         background: linear-gradient(to right, #ffffff, #4a90e2);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
+        -webkit-background-clip: text; -webkit-text-fill-color: transparent;
       }
 
       header p {
-        color: var(--text-secondary);
-        font-size: 0.9rem;
-        margin-top: 0.25rem;
+        color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.25rem;
       }
 
       .glass-panel {
@@ -88,227 +64,229 @@
         backdrop-filter: var(--glass-blur);
         -webkit-backdrop-filter: var(--glass-blur);
         border: 1px solid var(--glass-border);
-        border-radius: 20px;
-        padding: 1.5rem;
+        border-radius: 20px; padding: 1.5rem;
         box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
       }
 
       #planet-info {
-        width: 380px;
-        position: fixed;
-        top: 2rem;
-        right: 2rem;
-        z-index: 9999;
+        width: 380px; position: fixed; top: 2rem; right: 2rem; z-index: 9999;
         transition: opacity 0.3s ease-out, transform 0.3s ease-out;
-        opacity: 0;
-        pointer-events: none;
-        transform: translateY(-20px);
+        opacity: 0; pointer-events: none; transform: translateY(-20px);
       }
 
       #planet-name, #moon-name {
-        font-size: 1.5rem;
-        margin: 0;
-        color: #fff;
-        flex-grow: 1;
-        text-align: center;
+        font-size: 1.5rem; margin: 0; color: #fff;
+        flex-grow: 1; text-align: center;
       }
 
       .nav-header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        margin-bottom: 1rem;
-        border-bottom: 1px solid var(--glass-border);
-        padding-bottom: 0.5rem;
+        display: flex; align-items: center; justify-content: space-between;
+        margin-bottom: 1rem; border-bottom: 1px solid var(--glass-border); padding-bottom: 0.5rem;
       }
 
       .nav-btn {
-        background: rgba(255, 255, 255, 0.1);
-        border: 1px solid var(--glass-border);
-        color: white;
-        width: 36px;
-        height: 36px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        transition: all 0.2s;
-        padding: 0;
-        flex-shrink: 0;
+        background: rgba(255,255,255,0.1); border: 1px solid var(--glass-border);
+        color: white; width: 36px; height: 36px; border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        cursor: pointer; transition: all 0.2s; padding: 0; flex-shrink: 0;
       }
-
       .nav-btn:hover {
-        background: rgba(255, 255, 255, 0.2);
-        border-color: var(--accent-color);
-        box-shadow: 0 0 10px rgba(74, 144, 226, 0.3);
+        background: rgba(255,255,255,0.2); border-color: var(--accent-color);
+        box-shadow: 0 0 10px rgba(74,144,226,0.3);
       }
 
-      .info-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 0.75rem;
-        margin: 1rem 0;
-      }
-
-      .info-item {
-        display: flex;
-        flex-direction: column;
-        font-size: 0.8rem;
-      }
-
-      .label {
-        color: var(--text-secondary);
-        font-size: 0.7rem;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-        margin-bottom: 0.2rem;
-      }
-
-      .value {
-        font-weight: 600;
-        color: var(--accent-color);
-        font-size: 0.95rem;
-      }
+      .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin: 1rem 0; }
+      .info-item { display: flex; flex-direction: column; font-size: 0.8rem; }
+      .label { color: var(--text-secondary); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.2rem; }
+      .value { font-weight: 600; color: var(--accent-color); font-size: 0.95rem; }
 
       #planet-fun-fact, #moon-fun-fact {
-        font-style: italic;
-        font-size: 0.85rem;
-        margin: 1rem 0;
-        padding: 0.75rem;
-        background: rgba(74, 144, 226, 0.1);
-        border-left: 3px solid var(--accent-color);
-        border-radius: 4px;
+        font-style: italic; font-size: 0.85rem; margin: 1rem 0; padding: 0.75rem;
+        background: rgba(74,144,226,0.1); border-left: 3px solid var(--accent-color); border-radius: 4px;
       }
 
       #planet-description, #moon-description {
-        font-size: 0.85rem;
-        line-height: 1.6;
-        color: var(--text-secondary);
-        margin-bottom: 1rem;
+        font-size: 0.85rem; line-height: 1.6; color: var(--text-secondary); margin-bottom: 1rem;
       }
 
       #moon-info {
-        width: 380px;
-        position: fixed;
-        top: 2rem;
-        right: calc(2rem + 400px);
-        z-index: 9998;
+        width: 380px; position: fixed; top: 2rem; right: calc(2rem + 400px); z-index: 9998;
         transition: opacity 0.3s ease-out, transform 0.3s ease-out;
-        opacity: 0;
-        pointer-events: none;
-        transform: translateY(-20px);
+        opacity: 0; pointer-events: none; transform: translateY(-20px);
       }
 
-      .moon-link {
-        cursor: pointer;
-        color: var(--accent-color);
-        text-decoration: underline;
-        transition: color 0.2s;
-      }
-      .moon-link:hover {
-        color: #ffffff;
-      }
+      .moon-link { cursor: pointer; color: var(--accent-color); text-decoration: underline; transition: color 0.2s; }
+      .moon-link:hover { color: #ffffff; }
 
-      .toggle-container {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        margin-top: 10px;
-        justify-content: center;
-      }
-
-      .switch {
-        position: relative;
-        display: inline-block;
-        width: 40px;
-        height: 20px;
-      }
-
-      .switch input {
-        opacity: 0;
-        width: 0;
-        height: 0;
-      }
-
-      .slider {
-        position: absolute;
-        cursor: pointer;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background-color: #333;
-        transition: .4s;
-        border-radius: 34px;
-      }
-
-      .slider:before {
-        position: absolute;
-        content: "";
-        height: 14px;
-        width: 14px;
-        left: 3px;
-        bottom: 3px;
-        background-color: white;
-        transition: .4s;
-        border-radius: 50%;
-      }
-
-      input:checked + .slider {
-        background-color: var(--accent-color);
-      }
-
-      input:checked + .slider:before {
-        transform: translateX(20px);
-      }
+      .toggle-container { display: flex; align-items: center; gap: 10px; margin-top: 10px; justify-content: center; }
+      .switch { position: relative; display: inline-block; width: 40px; height: 20px; }
+      .switch input { opacity: 0; width: 0; height: 0; }
+      .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #333; transition: .4s; border-radius: 34px; }
+      .slider:before { position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
+      input:checked + .slider { background-color: var(--accent-color); }
+      input:checked + .slider:before { transform: translateX(20px); }
 
       button {
-        width: 100%;
-        padding: 0.75rem;
-        border: 1px solid var(--glass-border);
-        background: rgba(255, 255, 255, 0.1);
-        color: white;
-        border-radius: 10px;
-        cursor: pointer;
-        transition: all 0.2s;
-        font-family: inherit;
-        font-weight: 600;
+        width: 100%; padding: 0.75rem; border: 1px solid var(--glass-border);
+        background: rgba(255,255,255,0.1); color: white; border-radius: 10px;
+        cursor: pointer; transition: all 0.2s; font-family: inherit; font-weight: 600;
       }
-
-      button:hover {
-        background: rgba(255, 255, 255, 0.2);
-        border-color: var(--accent-color);
-      }
+      button:hover { background: rgba(255,255,255,0.2); border-color: var(--accent-color); }
 
       #controls-hint {
-        text-align: center;
-        color: var(--text-secondary);
-        font-size: 0.8rem;
-        padding: 0.5rem 1.5rem;
-        background: rgba(0, 0, 0, 0.4);
-        border: 1px solid var(--glass-border);
-        border-radius: 50px;
-        width: fit-content;
-        margin: 0 auto;
-        pointer-events: auto;
-        position: absolute;
-        bottom: 2rem;
-        left: 50%;
-        transform: translateX(-50%);
+        text-align: center; color: var(--text-secondary); font-size: 0.8rem;
+        padding: 0.5rem 1.5rem; background: rgba(0,0,0,0.4);
+        border: 1px solid var(--glass-border); border-radius: 50px;
+        width: fit-content; margin: 0 auto; pointer-events: auto;
+        position: absolute; bottom: 2rem; left: 50%; transform: translateX(-50%);
+      }
+
+      /* ── Header utility buttons ── */
+      #origin-reopen-btn {
+        background: none; border: none; color: var(--text-secondary);
+        font-size: 1.1rem; padding: 2px 6px; width: auto; cursor: pointer;
+        border-radius: 8px; transition: color 0.2s, background 0.2s;
+        vertical-align: middle; margin-left: 0.5rem; line-height: 1;
+      }
+      #origin-reopen-btn:hover { color: #fff; background: rgba(255,255,255,0.1); }
+
+      /* ── Origin Story Modal ── */
+      #origin-overlay {
+        position: fixed; inset: 0; z-index: 999999;
+        display: flex; align-items: center; justify-content: center;
+        background: rgba(0,0,0,0.78); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+        animation: originFadeIn 0.9s ease forwards;
+      }
+      #origin-overlay.dismissing { animation: originFadeOut 0.5s ease forwards; pointer-events: none; }
+      @keyframes originFadeIn  { from { opacity: 0; } to { opacity: 1; } }
+      @keyframes originFadeOut { from { opacity: 1; } to { opacity: 0; } }
+
+      #origin-modal {
+        position: relative; width: min(500px, 92vw); overflow: hidden;
+        border-radius: 28px; animation: originSlideIn 0.85s cubic-bezier(0.16, 1, 0.3, 1) both;
+      }
+      @keyframes originSlideIn {
+        from { transform: translateY(36px) scale(0.94); opacity: 0; }
+        to   { transform: translateY(0)     scale(1);    opacity: 1; }
+      }
+
+      #origin-shimmer {
+        position: absolute; inset: 0;
+        background: radial-gradient(ellipse at 15% 15%, rgba(74,144,226,0.18) 0%, transparent 60%),
+                    radial-gradient(ellipse at 85% 85%, rgba(147,51,234,0.13) 0%, transparent 60%);
+        pointer-events: none; animation: shimmerPulse 4s ease-in-out infinite;
+      }
+      @keyframes shimmerPulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.55; } }
+
+      #origin-header { display: flex; align-items: center; justify-content: center; gap: 0.7rem; margin-bottom: 1.4rem; }
+      #origin-emoji  { font-size: 1.9rem; }
+      #origin-title  {
+        font-size: 1.55rem; font-weight: 600; margin: 0;
+        background: linear-gradient(to right, #ffffff, #4a90e2);
+        -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      }
+
+      #origin-roles { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.7rem; margin-bottom: 1.4rem; }
+
+      .role-chip {
+        display: flex; align-items: center; gap: 0.6rem;
+        background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12);
+        border-radius: 14px; padding: 0.7rem 0.8rem;
+        opacity: 0; animation: chipFadeIn 0.45s ease forwards;
+        transition: background 0.25s, border-color 0.25s, transform 0.25s;
+      }
+      .role-chip:nth-child(1) { animation-delay: 0.4s; }
+      .role-chip:nth-child(2) { animation-delay: 0.55s; }
+      .role-chip:nth-child(3) { animation-delay: 0.7s; }
+      @keyframes chipFadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+      .role-chip:hover { background: rgba(74,144,226,0.15); border-color: rgba(74,144,226,0.45); transform: translateY(-2px); }
+      .role-icon  { font-size: 1.45rem; flex-shrink: 0; }
+      .role-text  { display: flex; flex-direction: column; }
+      .role-title { font-weight: 600; font-size: 0.85rem; color: #fff; }
+      .role-sub   { font-size: 0.7rem; color: rgba(255,255,255,0.52); margin-top: 0.1rem; }
+
+      #origin-story {
+        font-size: 0.875rem; line-height: 1.75; color: rgba(255,255,255,0.72);
+        margin-bottom: 1.2rem; text-align: center;
+      }
+      #origin-story strong { color: #fff; font-weight: 600; }
+      #origin-story em     { color: rgba(255,255,255,0.6); }
+
+      #origin-progress-bar { height: 3px; background: rgba(255,255,255,0.1); border-radius: 2px; margin-bottom: 1.2rem; overflow: hidden; }
+      #origin-progress-fill {
+        height: 100%; width: 100%;
+        background: linear-gradient(to right, #4a90e2, #9333ea);
+        border-radius: 2px; transform-origin: left;
+        animation: progressDrain 15s linear forwards;
+      }
+      @keyframes progressDrain { from { transform: scaleX(1); } to { transform: scaleX(0); } }
+
+      #origin-launch-btn {
+        background: linear-gradient(135deg, rgba(74,144,226,0.28), rgba(147,51,234,0.18)) !important;
+        border: 1px solid rgba(74,144,226,0.5) !important;
+        font-size: 1rem; letter-spacing: 0.03em;
+      }
+      #origin-launch-btn:hover {
+        background: linear-gradient(135deg, rgba(74,144,226,0.48), rgba(147,51,234,0.32)) !important;
+        border-color: rgba(74,144,226,0.85) !important;
+        box-shadow: 0 8px 28px rgba(74,144,226,0.32) !important;
+        transform: translateY(-1px);
       }
     </style>
   </head>
   <body>
+
+    <!-- ── Origin Story Modal ── -->
+    <div id="origin-overlay">
+      <div id="origin-modal" class="glass-panel">
+        <div id="origin-shimmer"></div>
+        <div id="origin-header">
+          <span id="origin-emoji">🚀</span>
+          <h2 id="origin-title">A Dad, a Kid &amp; an AI</h2>
+        </div>
+        <div id="origin-roles">
+          <div class="role-chip">
+            <span class="role-icon">🎮</span>
+            <div class="role-text">
+              <span class="role-title">Product Owner</span>
+              <span class="role-sub">Age 7 · Vision &amp; Fun</span>
+            </div>
+          </div>
+          <div class="role-chip">
+            <span class="role-icon">🛠️</span>
+            <div class="role-text">
+              <span class="role-title">Builder</span>
+              <span class="role-sub">Dad · Connected the dots</span>
+            </div>
+          </div>
+          <div class="role-chip">
+            <span class="role-icon">🤖</span>
+            <div class="role-text">
+              <span class="role-title">AI Assistant</span>
+              <span class="role-sub">Coding muscle</span>
+            </div>
+          </div>
+        </div>
+        <p id="origin-story">
+          A weekend project born from one very specific brief: <em>"I want to see all the planets. And the moons. And make it spinny."</em> The <strong>7-year-old</strong> called every feature. <strong>Dad</strong> built it — with a little help from an <strong>AI coding assistant</strong>.
+        </p>
+        <div id="origin-progress-bar"><div id="origin-progress-fill"></div></div>
+        <button id="origin-launch-btn">Explore the Universe →</button>
+      </div>
+    </div>
+
     <div id="app">
       <canvas id="solar-canvas"></canvas>
-      
+
       <div id="ui-overlay">
         <header>
           <h1>Solar System Simulator</h1>
-          <p id="system-time">Real-time Simulation <a href="/user-manual.html" target="_blank" style="margin-left: 1rem; color: var(--accent-color); text-decoration: none; font-weight: bold; background: rgba(255,255,255,0.1); padding: 2px 8px; border-radius: 12px; transition: all 0.2s; pointer-events: auto;">📖 User Manual</a></p>
+          <p id="system-time">Real-time Simulation
+            <a href="/user-manual.html" target="_blank" style="margin-left:1rem;color:var(--accent-color);text-decoration:none;font-weight:bold;background:rgba(255,255,255,0.1);padding:2px 8px;border-radius:12px;transition:all 0.2s;pointer-events:auto;">📖 User Manual</a>
+            <button id="origin-reopen-btn" title="About this project">👨‍👩‍👦</button>
+          </p>
         </header>
-        
+
         <div id="planet-info" class="glass-panel">
           <div class="nav-header">
             <button id="prev-btn" class="nav-btn" title="Previous Planet">
@@ -320,42 +298,18 @@
             </button>
           </div>
           <div class="info-grid">
-            <div class="info-item">
-              <span class="label">Mass</span>
-              <span id="planet-mass" class="value">-</span>
-            </div>
-            <div class="info-item">
-              <span class="label">Gravity</span>
-              <span id="planet-gravity" class="value">-</span>
-            </div>
-            <div class="info-item">
-              <span class="label">Temperature</span>
-              <span id="planet-temp" class="value">-</span>
-            </div>
-            <div class="info-item">
-              <span class="label">Velocity</span>
-              <span id="planet-velocity" class="value">-</span>
-            </div>
-            <div class="info-item">
-              <span class="label">Radius</span>
-              <span id="planet-radius-km" class="value">-</span>
-            </div>
-            <div class="info-item">
-              <span class="label">Orbital Period</span>
-              <span id="planet-orbital-period" class="value">-</span>
-            </div>
-            <div class="info-item">
-              <span class="label">Day Length</span>
-              <span id="planet-day-length" class="value">-</span>
-            </div>
-            <div class="info-item">
-              <span class="label">Moons Count</span>
-              <span id="planet-moons-count" class="value">-</span>
-            </div>
+            <div class="info-item"><span class="label">Mass</span><span id="planet-mass" class="value">-</span></div>
+            <div class="info-item"><span class="label">Gravity</span><span id="planet-gravity" class="value">-</span></div>
+            <div class="info-item"><span class="label">Temperature</span><span id="planet-temp" class="value">-</span></div>
+            <div class="info-item"><span class="label">Velocity</span><span id="planet-velocity" class="value">-</span></div>
+            <div class="info-item"><span class="label">Radius</span><span id="planet-radius-km" class="value">-</span></div>
+            <div class="info-item"><span class="label">Orbital Period</span><span id="planet-orbital-period" class="value">-</span></div>
+            <div class="info-item"><span class="label">Day Length</span><span id="planet-day-length" class="value">-</span></div>
+            <div class="info-item"><span class="label">Moons Count</span><span id="planet-moons-count" class="value">-</span></div>
           </div>
-          <div class="info-item" style="margin-bottom: 1rem;">
+          <div class="info-item" style="margin-bottom:1rem;">
             <span class="label">Major Moons (Click to view)</span>
-            <span id="planet-moons-list" class="value" style="font-size: 0.85rem; color: #fff;">-</span>
+            <span id="planet-moons-list" class="value" style="font-size:0.85rem;color:#fff;">-</span>
           </div>
           <p id="planet-fun-fact"></p>
           <p id="planet-description"></p>
@@ -373,30 +327,12 @@
             </button>
           </div>
           <div class="info-grid">
-            <div class="info-item">
-              <span class="label">Mass</span>
-              <span id="moon-mass" class="value">-</span>
-            </div>
-            <div class="info-item">
-              <span class="label">Gravity</span>
-              <span id="moon-gravity" class="value">-</span>
-            </div>
-            <div class="info-item">
-              <span class="label">Temperature</span>
-              <span id="moon-temp" class="value">-</span>
-            </div>
-            <div class="info-item">
-              <span class="label">Radius</span>
-              <span id="moon-radius-km" class="value">-</span>
-            </div>
-            <div class="info-item">
-              <span class="label">Orbital Period</span>
-              <span id="moon-orbital-period" class="value">-</span>
-            </div>
-            <div class="info-item">
-              <span class="label">Day Length</span>
-              <span id="moon-day-length" class="value">-</span>
-            </div>
+            <div class="info-item"><span class="label">Mass</span><span id="moon-mass" class="value">-</span></div>
+            <div class="info-item"><span class="label">Gravity</span><span id="moon-gravity" class="value">-</span></div>
+            <div class="info-item"><span class="label">Temperature</span><span id="moon-temp" class="value">-</span></div>
+            <div class="info-item"><span class="label">Radius</span><span id="moon-radius-km" class="value">-</span></div>
+            <div class="info-item"><span class="label">Orbital Period</span><span id="moon-orbital-period" class="value">-</span></div>
+            <div class="info-item"><span class="label">Day Length</span><span id="moon-day-length" class="value">-</span></div>
           </div>
           <p id="moon-fun-fact"></p>
           <p id="moon-description"></p>
@@ -405,17 +341,53 @@
 
         <div id="controls-hint">
           <p>🖱️ Left Click: Rotate | ↔️ Right Click: Pan | 🔍 Scroll: Zoom</p>
-          <div style="display: flex; gap: 2rem; justify-content: center; margin-top: 10px;">
-            <div class="toggle-container" style="margin-top: 0;">
+          <div style="display:flex;gap:2rem;justify-content:center;margin-top:10px;">
+            <div class="toggle-container" style="margin-top:0;">
               <label class="switch">
                 <input type="checkbox" id="toggle-moons" checked>
                 <span class="slider round"></span>
               </label>
               <span>Show Moons</span>
+            </div>
           </div>
         </div>
       </div>
     </div>
+
     <script type="module" src="/main.js"></script>
+    <script>
+      // ── Origin Story Modal ──
+      (function () {
+        const overlay   = document.getElementById('origin-overlay');
+        const launchBtn = document.getElementById('origin-launch-btn');
+        const reopenBtn = document.getElementById('origin-reopen-btn');
+        let autoTimer = null;
+
+        function dismiss() {
+          clearTimeout(autoTimer);
+          overlay.classList.add('dismissing');
+          setTimeout(() => { overlay.style.display = 'none'; }, 500);
+        }
+
+        function reopen() {
+          const bar     = document.getElementById('origin-progress-bar');
+          const fill    = document.getElementById('origin-progress-fill');
+          const newFill = fill.cloneNode(true);
+          bar.replaceChild(newFill, fill);
+          document.querySelectorAll('.role-chip').forEach(c => {
+            c.style.animation = 'none';
+            c.offsetHeight;
+            c.style.animation = '';
+          });
+          overlay.classList.remove('dismissing');
+          overlay.style.display = 'flex';
+          autoTimer = setTimeout(dismiss, 15000);
+        }
+
+        launchBtn.addEventListener('click', dismiss);
+        reopenBtn.addEventListener('click', reopen);
+        autoTimer = setTimeout(dismiss, 15000);
+      })();
+    </script>
   </body>
 </html>
