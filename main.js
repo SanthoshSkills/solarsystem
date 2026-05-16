@@ -746,6 +746,36 @@ function animate() {
     else if (yearsAgo > 4.50) formationStageText.innerText = "🔥 Solar Ignition & Planet Condensation";
     else if (yearsAgo > 3.80) formationStageText.innerText = "☄️ Late Heavy Bombardment";
     else formationStageText.innerText = "🌍 Stable Solar System";
+
+    // Update timeline runner: position + speed based on NARRATIVE time rate
+    const runner = document.getElementById('timeline-runner');
+    const runnerShadow = document.getElementById('timeline-runner-shadow');
+    if (runner) {
+      // Position: map t (0→1) to CSS left, corrected for thumb half-width
+      const pct = t * 100;
+      const offset = `calc(${pct}% + ${8 - t * 16}px)`;
+      runner.style.left = offset;
+      if (runnerShadow) runnerShadow.style.left = offset;
+
+      // Rate of narrative time flow (BYA per unit t) — matches piecewise yearsAgo function
+      let narrativeRate;
+      if (t < 0.4)      narrativeRate = 0.10;  // 0.04 BYA over 40% of slider
+      else if (t < 0.7) narrativeRate = 0.20;  // 0.06 BYA over 30%
+      else if (t < 0.9) narrativeRate = 3.50;  // 0.70 BYA over 20%
+      else              narrativeRate = 38.0;  // 3.80 BYA over 10%
+
+      // Map log-scale rate → animation duration (2.0s=jog → 0.18s=sprint)
+      const logRate = Math.log(narrativeRate / 0.10) / Math.log(38.0 / 0.10);
+      const dur = Math.max(0.18, 2.0 - logRate * 1.82);
+      runner.style.animationDuration = `${dur}s`;
+      if (runnerShadow) runnerShadow.style.animationDuration = `${dur}s`;
+
+      // Pause runner when animation is paused
+      const playState = formationPaused ? 'paused' : 'running';
+      runner.style.animationPlayState = playState;
+      if (runnerShadow) runnerShadow.style.animationPlayState = playState;
+    }
+
     
     // Camera Cinematic Movement
     const camX = Math.sin(t * Math.PI * 2) * (600 - t * 150);
