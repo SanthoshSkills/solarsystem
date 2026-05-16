@@ -37,6 +37,10 @@
         width: 100%; height: 100%; z-index: 1;
       }
 
+      #future-lab-root {
+        position: relative; z-index: 5;
+      }
+
       #ui-overlay {
         position: absolute; top: 0; left: 0;
         width: 100%; height: 100%; z-index: 2;
@@ -297,15 +301,52 @@
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
             </button>
           </div>
-          <div class="info-grid">
-            <div class="info-item"><span class="label">Mass</span><span id="planet-mass" class="value">-</span></div>
-            <div class="info-item"><span class="label">Gravity</span><span id="planet-gravity" class="value">-</span></div>
-            <div class="info-item"><span class="label">Temperature</span><span id="planet-temp" class="value">-</span></div>
-            <div class="info-item"><span class="label">Velocity</span><span id="planet-velocity" class="value">-</span></div>
-            <div class="info-item"><span class="label">Radius</span><span id="planet-radius-km" class="value">-</span></div>
-            <div class="info-item"><span class="label">Orbital Period</span><span id="planet-orbital-period" class="value">-</span></div>
-            <div class="info-item"><span class="label">Day Length</span><span id="planet-day-length" class="value">-</span></div>
-            <div class="info-item"><span class="label">Moons Count</span><span id="planet-moons-count" class="value">-</span></div>
+          <div class="category-tabs" style="display:flex; gap:5px; margin: 10px 0; border-bottom:1px solid rgba(255,255,255,0.2); padding-bottom:5px; overflow-x:auto;">
+            <button class="tab-btn active" data-tab="physical" style="background:rgba(255,255,255,0.2); border:none; color:#fff; padding:4px 8px; border-radius:4px; font-size:0.8rem; cursor:pointer;">Physical</button>
+            <button class="tab-btn" data-tab="orbital" style="background:transparent; border:none; color:rgba(255,255,255,0.6); padding:4px 8px; border-radius:4px; font-size:0.8rem; cursor:pointer;">Orbital</button>
+            <button class="tab-btn" data-tab="atmosphere" style="background:transparent; border:none; color:rgba(255,255,255,0.6); padding:4px 8px; border-radius:4px; font-size:0.8rem; cursor:pointer;">Atmosphere & Rotation</button>
+            <button class="tab-btn" data-tab="system" style="background:transparent; border:none; color:rgba(255,255,255,0.6); padding:4px 8px; border-radius:4px; font-size:0.8rem; cursor:pointer;">System</button>
+          </div>
+
+          <div id="tab-physical" class="tab-content" style="display:block;">
+            <div class="info-grid">
+              <div class="info-item"><span class="label">Mass</span><span id="p-mass" class="value">-</span></div>
+              <div class="info-item"><span class="label">Volume</span><span id="p-vol" class="value">-</span></div>
+              <div class="info-item"><span class="label">Equatorial Radius</span><span id="p-eqrad" class="value">-</span></div>
+              <div class="info-item"><span class="label">Polar Radius</span><span id="p-polrad" class="value">-</span></div>
+              <div class="info-item"><span class="label">Density</span><span id="p-den" class="value">-</span></div>
+              <div class="info-item"><span class="label">Surface Gravity</span><span id="p-grav" class="value">-</span></div>
+              <div class="info-item"><span class="label">Escape Velocity</span><span id="p-esc" class="value">-</span></div>
+            </div>
+          </div>
+          <div id="tab-orbital" class="tab-content" style="display:none;">
+            <div class="info-grid">
+              <div class="info-item"><span class="label">Mean Distance</span><span id="p-dist" class="value">-</span></div>
+              <div class="info-item"><span class="label">Periapsis</span><span id="p-peri" class="value">-</span></div>
+              <div class="info-item"><span class="label">Apoapsis</span><span id="p-aph" class="value">-</span></div>
+              <div class="info-item"><span class="label">Orbital Period</span><span id="p-orbper" class="value">-</span></div>
+              <div class="info-item"><span class="label">Orbital Velocity</span><span id="p-orbvel" class="value">-</span></div>
+              <div class="info-item"><span class="label">Eccentricity</span><span id="p-ecc" class="value">-</span></div>
+              <div class="info-item"><span class="label">Inclination</span><span id="p-inc" class="value">-</span></div>
+            </div>
+          </div>
+          <div id="tab-atmosphere" class="tab-content" style="display:none;">
+            <div class="info-grid">
+              <div class="info-item"><span class="label">Day Length</span><span id="p-day" class="value">-</span></div>
+              <div class="info-item"><span class="label">Axial Tilt</span><span id="p-tilt" class="value">-</span></div>
+              <div class="info-item"><span class="label">Mean Temperature</span><span id="p-temp" class="value">-</span></div>
+              <div class="info-item"><span class="label">Surface Pressure</span><span id="p-pres" class="value">-</span></div>
+              <div class="info-item" style="grid-column: span 2;"><span class="label">Atmosphere</span><span id="p-atmos" class="value">-</span></div>
+            </div>
+          </div>
+          <div id="tab-system" class="tab-content" style="display:none;">
+            <div class="info-grid">
+              <div class="info-item"><span class="label">Moons Count</span><span id="p-moons" class="value">-</span></div>
+              <div class="info-item"><span class="label">Ring System</span><span id="p-rings" class="value">-</span></div>
+              <div class="info-item"><span class="label">Magnetic Field</span><span id="p-mag" class="value">-</span></div>
+              <div class="info-item"><span class="label">Discoverer</span><span id="p-disc" class="value">-</span></div>
+              <div class="info-item"><span class="label">Discovery Date</span><span id="p-discdate" class="value">-</span></div>
+            </div>
           </div>
           <div class="info-item" style="margin-bottom:1rem;">
             <span class="label">Major Moons (Click to view)</span>
@@ -326,13 +367,52 @@
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
             </button>
           </div>
-          <div class="info-grid">
-            <div class="info-item"><span class="label">Mass</span><span id="moon-mass" class="value">-</span></div>
-            <div class="info-item"><span class="label">Gravity</span><span id="moon-gravity" class="value">-</span></div>
-            <div class="info-item"><span class="label">Temperature</span><span id="moon-temp" class="value">-</span></div>
-            <div class="info-item"><span class="label">Radius</span><span id="moon-radius-km" class="value">-</span></div>
-            <div class="info-item"><span class="label">Orbital Period</span><span id="moon-orbital-period" class="value">-</span></div>
-            <div class="info-item"><span class="label">Day Length</span><span id="moon-day-length" class="value">-</span></div>
+          <div class="category-tabs" style="display:flex; gap:5px; margin: 10px 0; border-bottom:1px solid rgba(255,255,255,0.2); padding-bottom:5px; overflow-x:auto;">
+            <button class="m-tab-btn active" data-tab="m-tab-physical" style="background:rgba(255,255,255,0.2); border:none; color:#fff; padding:4px 8px; border-radius:4px; font-size:0.8rem; cursor:pointer;">Physical</button>
+            <button class="m-tab-btn" data-tab="m-tab-orbital" style="background:transparent; border:none; color:rgba(255,255,255,0.6); padding:4px 8px; border-radius:4px; font-size:0.8rem; cursor:pointer;">Orbital</button>
+            <button class="m-tab-btn" data-tab="m-tab-atmosphere" style="background:transparent; border:none; color:rgba(255,255,255,0.6); padding:4px 8px; border-radius:4px; font-size:0.8rem; cursor:pointer;">Atmosphere & Rotation</button>
+            <button class="m-tab-btn" data-tab="m-tab-system" style="background:transparent; border:none; color:rgba(255,255,255,0.6); padding:4px 8px; border-radius:4px; font-size:0.8rem; cursor:pointer;">System</button>
+          </div>
+
+          <div id="m-tab-physical" class="m-tab-content" style="display:block;">
+            <div class="info-grid">
+              <div class="info-item"><span class="label">Mass</span><span id="m-mass" class="value">-</span></div>
+              <div class="info-item"><span class="label">Volume</span><span id="m-vol" class="value">-</span></div>
+              <div class="info-item"><span class="label">Equatorial Radius</span><span id="m-eqrad" class="value">-</span></div>
+              <div class="info-item"><span class="label">Polar Radius</span><span id="m-polrad" class="value">-</span></div>
+              <div class="info-item"><span class="label">Density</span><span id="m-den" class="value">-</span></div>
+              <div class="info-item"><span class="label">Surface Gravity</span><span id="m-grav" class="value">-</span></div>
+              <div class="info-item"><span class="label">Escape Velocity</span><span id="m-esc" class="value">-</span></div>
+            </div>
+          </div>
+          <div id="m-tab-orbital" class="m-tab-content" style="display:none;">
+            <div class="info-grid">
+              <div class="info-item"><span class="label">Mean Distance</span><span id="m-dist" class="value">-</span></div>
+              <div class="info-item"><span class="label">Periapsis</span><span id="m-peri" class="value">-</span></div>
+              <div class="info-item"><span class="label">Apoapsis</span><span id="m-aph" class="value">-</span></div>
+              <div class="info-item"><span class="label">Orbital Period</span><span id="m-orbper" class="value">-</span></div>
+              <div class="info-item"><span class="label">Orbital Velocity</span><span id="m-orbvel" class="value">-</span></div>
+              <div class="info-item"><span class="label">Eccentricity</span><span id="m-ecc" class="value">-</span></div>
+              <div class="info-item"><span class="label">Inclination</span><span id="m-inc" class="value">-</span></div>
+            </div>
+          </div>
+          <div id="m-tab-atmosphere" class="m-tab-content" style="display:none;">
+            <div class="info-grid">
+              <div class="info-item"><span class="label">Day Length</span><span id="m-day" class="value">-</span></div>
+              <div class="info-item"><span class="label">Axial Tilt</span><span id="m-tilt" class="value">-</span></div>
+              <div class="info-item"><span class="label">Mean Temperature</span><span id="m-temp" class="value">-</span></div>
+              <div class="info-item"><span class="label">Surface Pressure</span><span id="m-pres" class="value">-</span></div>
+              <div class="info-item" style="grid-column: span 2;"><span class="label">Atmosphere</span><span id="m-atmos" class="value">-</span></div>
+            </div>
+          </div>
+          <div id="m-tab-system" class="m-tab-content" style="display:none;">
+            <div class="info-grid">
+              <div class="info-item"><span class="label">Moons Count</span><span id="m-moons" class="value">-</span></div>
+              <div class="info-item"><span class="label">Ring System</span><span id="m-rings" class="value">-</span></div>
+              <div class="info-item"><span class="label">Magnetic Field</span><span id="m-mag" class="value">-</span></div>
+              <div class="info-item"><span class="label">Discoverer</span><span id="m-disc" class="value">-</span></div>
+              <div class="info-item"><span class="label">Discovery Date</span><span id="m-discdate" class="value">-</span></div>
+            </div>
           </div>
           <p id="moon-fun-fact"></p>
           <p id="moon-description"></p>
@@ -352,6 +432,28 @@
           </div>
         </div>
       </div>
+      <div id="formation-ui" style="display:none; position:absolute; bottom:30px; left:50%; transform:translateX(-50%); width:90%; max-width:700px; z-index:10; background:rgba(10,10,30,0.85); padding:20px; border-radius:24px; color:white; font-family:'Outfit', sans-serif; pointer-events:auto; border:1px solid rgba(100,180,255,0.3); backdrop-filter:blur(15px); flex-direction:column; gap:15px; box-shadow:0 10px 40px rgba(0,0,0,0.6);">
+        
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <div style="display:flex; flex-direction:column;">
+            <div id="formation-stage-text" style="font-size:1.4rem; font-weight:600; color:#ffcc00; text-shadow:0 0 15px rgba(255,200,0,0.5);">✨ Giant Molecular Cloud</div>
+            <div id="formation-time-counter" style="font-size:1rem; color:rgba(255,255,255,0.7); margin-top:2px;">4.60 Billion Years Ago</div>
+          </div>
+          <button id="skip-formation-btn" style="background:rgba(255,80,80,0.15); border:1px solid rgba(255,80,80,0.4); border-radius:12px; color:#ff8888; padding:6px 14px; font-size:0.9rem; cursor:pointer; font-weight:600; transition:all 0.2s;">Skip to Present ⏭️</button>
+        </div>
+
+        <div style="display:flex; align-items:center; gap:15px;">
+          <button id="play-pause-btn" style="width:48px; height:48px; border-radius:24px; border:none; background:linear-gradient(135deg, #4a90e2, #9333ea); color:white; font-size:1.4rem; cursor:pointer; display:flex; justify-content:center; align-items:center; box-shadow:0 4px 15px rgba(147,51,234,0.4); transition:transform 0.1s;">⏸️</button>
+          
+          <input type="range" id="formation-timeline" min="0" max="20" step="0.01" value="0" style="flex-grow:1; height:10px; border-radius:5px; -webkit-appearance:none; background:rgba(255,255,255,0.15); outline:none; cursor:pointer; border:1px solid rgba(255,255,255,0.1);">
+          
+          <div style="display:flex; gap:4px; background:rgba(0,0,0,0.4); padding:4px; border-radius:12px; border:1px solid rgba(255,255,255,0.1);">
+            <button class="speed-btn active" data-speed="1" style="background:rgba(255,255,255,0.2); border:none; border-radius:8px; color:white; padding:4px 10px; font-weight:bold; cursor:pointer;">1x</button>
+            <button class="speed-btn" data-speed="2" style="background:transparent; border:none; border-radius:8px; color:rgba(255,255,255,0.5); padding:4px 10px; font-weight:bold; cursor:pointer; transition:color 0.2s;">2x</button>
+            <button class="speed-btn" data-speed="4" style="background:transparent; border:none; border-radius:8px; color:rgba(255,255,255,0.5); padding:4px 10px; font-weight:bold; cursor:pointer; transition:color 0.2s;">4x</button>
+          </div>
+        </div>
+      </div>
     </div>
 
     <script type="module" src="/main.js"></script>
@@ -366,7 +468,10 @@
         function dismiss() {
           clearTimeout(autoTimer);
           overlay.classList.add('dismissing');
-          setTimeout(() => { overlay.style.display = 'none'; }, 500);
+          setTimeout(() => { 
+            overlay.style.display = 'none'; 
+            document.dispatchEvent(new Event('startFormation'));
+          }, 500);
         }
 
         function reopen() {
@@ -387,6 +492,63 @@
         launchBtn.addEventListener('click', dismiss);
         reopenBtn.addEventListener('click', reopen);
         autoTimer = setTimeout(dismiss, 15000);
+
+        document.getElementById('skip-formation-btn').addEventListener('click', () => {
+          document.dispatchEvent(new Event('skipFormation'));
+        });
+
+        // Scrubber UI Logic
+        const playBtn = document.getElementById('play-pause-btn');
+        const timeline = document.getElementById('formation-timeline');
+        const speedBtns = document.querySelectorAll('.speed-btn');
+
+        playBtn.addEventListener('click', () => {
+          document.dispatchEvent(new Event('toggleFormationPause'));
+          const isPaused = playBtn.innerText === '⏸️';
+          playBtn.innerText = isPaused ? '▶️' : '⏸️';
+        });
+
+        timeline.addEventListener('input', (e) => {
+          document.dispatchEvent(new CustomEvent('scrubFormation', { detail: { time: parseFloat(e.target.value) } }));
+        });
+
+        speedBtns.forEach(btn => {
+          btn.addEventListener('click', () => {
+            speedBtns.forEach(b => {
+              b.classList.remove('active');
+              b.style.background = 'transparent';
+              b.style.color = 'rgba(255,255,255,0.5)';
+            });
+            btn.classList.add('active');
+            btn.style.background = 'rgba(255,255,255,0.2)';
+            btn.style.color = 'white';
+            document.dispatchEvent(new CustomEvent('changeFormationSpeed', { detail: { speed: parseFloat(btn.dataset.speed) } }));
+          });
+        });
+        // Setup Tabs for Planets
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+          btn.addEventListener('click', (e) => {
+            document.querySelectorAll('.tab-btn').forEach(b => { b.classList.remove('active'); b.style.background = 'transparent'; b.style.color = 'rgba(255,255,255,0.6)'; });
+            e.target.classList.add('active');
+            e.target.style.background = 'rgba(255,255,255,0.2)';
+            e.target.style.color = '#fff';
+            document.querySelectorAll('.tab-content').forEach(c => c.style.display = 'none');
+            document.getElementById('tab-' + e.target.dataset.tab).style.display = 'block';
+          });
+        });
+
+        // Setup Tabs for Moons
+        document.querySelectorAll('.m-tab-btn').forEach(btn => {
+          btn.addEventListener('click', (e) => {
+            document.querySelectorAll('.m-tab-btn').forEach(b => { b.classList.remove('active'); b.style.background = 'transparent'; b.style.color = 'rgba(255,255,255,0.6)'; });
+            e.target.classList.add('active');
+            e.target.style.background = 'rgba(255,255,255,0.2)';
+            e.target.style.color = '#fff';
+            document.querySelectorAll('.m-tab-content').forEach(c => c.style.display = 'none');
+            document.getElementById(e.target.dataset.tab).style.display = 'block';
+          });
+        });
+
       })();
     </script>
   </body>

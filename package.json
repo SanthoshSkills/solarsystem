@@ -6,10 +6,17 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "nasa-sync": "node scripts/fetch-nasa-data.mjs"
   },
   "devDependencies": {
-    "vite": "^6.0.0"
+    "@testing-library/jest-dom": "^6.9.1",
+    "jsdom": "^29.1.1",
+    "playwright": "^1.60.0",
+    "vite": "^8.0.13",
+    "vitest": "^4.1.6"
   },
   "dependencies": {
     "three": "^0.170.0"

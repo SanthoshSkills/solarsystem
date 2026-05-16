@@ -57,10 +57,10 @@ scene.add(starfield);
 const textureLoader = new THREE.TextureLoader();
 
 // --- Lights ---
-const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
+const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
 scene.add(ambientLight);
 
-const sunLight = new THREE.PointLight(0xffffff, 4, 3000, 1);
+const sunLight = new THREE.PointLight(0xffffff, 6, 3000, 1);
 sunLight.position.set(0, 0, 0);
 scene.add(sunLight);
 
@@ -109,9 +109,9 @@ function createBelt(count, innerRadius, outerRadius, color, speed) {
   geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
   const material = new THREE.PointsMaterial({
     color: color,
-    size: 0.1,
+    size: 0.4,
     transparent: true,
-    opacity: 0.4,
+    opacity: 0.8,
     sizeAttenuation: true
   });
   
@@ -120,11 +120,74 @@ function createBelt(count, innerRadius, outerRadius, color, speed) {
   return belt;
 }
 
-const asteroidBelt = createBelt(6000, 45, 58, 0xaaaaaa, 0.0001);
+const asteroidBelt = createBelt(6000, 45, 58, 0xdddddd, 0.0001);
 scene.add(asteroidBelt);
 
-const kuiperBelt = createBelt(10000, 150, 260, 0x5577ff, 0.00005);
+const kuiperBelt = createBelt(10000, 150, 260, 0x99ccff, 0.00005);
 scene.add(kuiperBelt);
+
+// --- Formation Cinematic Assets ---
+let isFormationAnimating = false;
+let formationTime = 0;
+let formationSpeed = 1;
+let formationPaused = false;
+
+// Generate Soft Glow Texture
+function createGlowTexture() {
+  const canvas = document.createElement('canvas');
+  canvas.width = 128;
+  canvas.height = 128;
+  const ctx = canvas.getContext('2d');
+  const gradient = ctx.createRadialGradient(64, 64, 0, 64, 64, 64);
+  gradient.addColorStop(0, 'rgba(255,255,255,1)');
+  gradient.addColorStop(0.2, 'rgba(255,200,100,0.8)');
+  gradient.addColorStop(0.5, 'rgba(100,50,255,0.2)');
+  gradient.addColorStop(1, 'rgba(0,0,0,0)');
+  ctx.fillStyle = gradient;
+  ctx.fillRect(0, 0, 128, 128);
+  return new THREE.CanvasTexture(canvas);
+}
+const glowTex = createGlowTexture();
+
+// Cinematic Dust Cloud
+const dustCount = 20000;
+const dustGeo = new THREE.BufferGeometry();
+const dustPos = new Float32Array(dustCount * 3);
+const dustColors = new Float32Array(dustCount * 3);
+const initialData = new Float32Array(dustCount * 4); // r, theta, phi, phase
+
+const cObj = new THREE.Color();
+for(let i=0; i<dustCount; i++) {
+  const r = 200 + Math.random() * 400;
+  const theta = Math.random() * Math.PI * 2;
+  const phi = Math.acos(Math.random() * 2 - 1);
+  dustPos[i*3] = r * Math.sin(phi) * Math.cos(theta);
+  dustPos[i*3+1] = r * Math.sin(phi) * Math.sin(theta);
+  dustPos[i*3+2] = r * Math.cos(phi);
+  
+  initialData[i*4] = r;
+  initialData[i*4+1] = theta;
+  initialData[i*4+2] = phi;
+  initialData[i*4+3] = Math.random() * Math.PI * 2;
+  
+  const mix = Math.random();
+  if (mix < 0.4) cObj.setHex(0xffaa00);
+  else if (mix < 0.7) cObj.setHex(0x5588ff);
+  else cObj.setHex(0x8833ff);
+  dustColors[i*3] = cObj.r;
+  dustColors[i*3+1] = cObj.g;
+  dustColors[i*3+2] = cObj.b;
+}
+
+dustGeo.setAttribute('position', new THREE.BufferAttribute(dustPos, 3));
+dustGeo.setAttribute('color', new THREE.BufferAttribute(dustColors, 3));
+const dustMat = new THREE.PointsMaterial({
+  size: 8, map: glowTex, blending: THREE.AdditiveBlending,
+  depthWrite: false, transparent: true, vertexColors: true, opacity: 1.0
+});
+const dustSystem = new THREE.Points(dustGeo, dustMat);
+dustSystem.visible = false;
+scene.add(dustSystem);
 
 // --- Planets & Moons ---
 const planets = [];
@@ -394,16 +457,52 @@ window.addEventListener('click', (event) => {
   }
 });
 
+document.addEventListener('openPlanetCarousel', () => {
+  // If nothing is currently pinned, default to the Sun or first planet in navList
+  if (!pinnedObject) {
+    const defaultData = navList[0]; // Sun
+    pinnedObject = getObjectByName(defaultData.name);
+    currentNavIndex = 0;
+    showInfo(defaultData);
+    focusing = true;
+    focusData = defaultData;
+  }
+});
+
+function populateGrid(data, prefix) {
+  const g = (id, key) => { const el = document.getElementById(prefix + id); if (el) el.innerText = data[key] || 'N/A'; };
+  g('mass', 'mass');
+  g('vol', 'volume');
+  g('eqrad', 'eqRadius');
+  g('polrad', 'polarRadius');
+  g('den', 'density');
+  g('grav', 'gravity');
+  g('esc', 'escapeVelocity');
+  
+  g('dist', 'meanDistance');
+  g('peri', 'perihelion');
+  g('aph', 'aphelion');
+  g('orbper', 'orbitalPeriod');
+  g('orbvel', 'orbitalVelocity');
+  g('ecc', 'orbEccentricity');
+  g('inc', 'inclination');
+  
+  g('day', 'dayLength');
+  g('tilt', 'axialTilt');
+  g('temp', 'meanTemp');
+  g('pres', 'surfacePressure');
+  g('atmos', 'atmosphere');
+  
+  g('moons', 'moonsCount');
+  g('rings', 'ringSystem');
+  g('mag', 'globalMagneticField');
+  g('disc', 'discoverer');
+  g('discdate', 'discoveryDate');
+}
+
 function showInfo(data) {
   planetName.innerText = data.name;
-  planetMass.innerText = data.mass || 'N/A';
-  planetGrav.innerText = data.gravity || 'N/A';
-  planetTemp.innerText = data.temp || 'N/A';
-  planetVel.innerText = data.speed ? `${(data.speed * 1000).toFixed(2)} km/s` : 'N/A';
-  if(planetRadiusKm) planetRadiusKm.innerText = data.radiusKm || 'N/A';
-  if(planetOrbitalPeriod) planetOrbitalPeriod.innerText = data.orbitalPeriod || 'N/A';
-  if(planetDayLength) planetDayLength.innerText = data.dayLength || 'N/A';
-  if(planetMoonsCount) planetMoonsCount.innerText = data.moonsCount !== undefined ? data.moonsCount : (data.moons ? data.moons.length : 0);
+  populateGrid(data, 'p-');
   planetFact.innerText = data.funFact || 'Exploring the unknown...';
   planetDesc.innerText = data.description || '';
   
@@ -446,13 +545,8 @@ function showInfo(data) {
 
 function showMoonInfo(moonData) {
   moonName.innerText = moonData.name;
-  moonMass.innerText = moonData.mass || 'N/A';
-  moonGrav.innerText = moonData.gravity || 'N/A';
-  moonTemp.innerText = moonData.temp || 'N/A';
-  moonRadiusKm.innerText = moonData.radiusKm || 'N/A';
-  moonOrbitalPeriod.innerText = moonData.orbitalPeriod || 'N/A';
-  moonDayLength.innerText = moonData.dayLength || 'N/A';
-  moonFact.innerText = moonData.funFact || 'Exploring the unknown...';
+  populateGrid(moonData, 'm-');
+  moonFact.innerText = moonData.funFact || 'A silent witness to cosmic history...';
   moonDesc.innerText = moonData.description || '';
 
   moonInfo.style.opacity = '1';
@@ -536,10 +630,72 @@ document.getElementById('toggle-moons').addEventListener('change', (e) => {
   showMoons = e.target.checked;
   planets.forEach(p => {
     p.moons.forEach(m => {
-      m.mesh.visible = showMoons;
+      m.mesh.visible = showMoons && !isFormationAnimating;
     });
   });
   updateTargets();
+});
+
+// Formation Event Listener
+document.addEventListener('startFormation', () => {
+  const formationUi = document.getElementById('formation-ui');
+  const formationStageText = document.getElementById('formation-stage-text');
+  
+  if (!formationUi) return;
+
+  isFormationAnimating = true;
+  formationTime = 0;
+  formationSpeed = 1;
+  formationPaused = false;
+  
+  // UI Resets
+  document.getElementById('play-pause-btn').innerText = '⏸️';
+  document.getElementById('formation-timeline').value = 0;
+  document.querySelectorAll('.speed-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.speed == '1');
+    btn.style.background = btn.dataset.speed == '1' ? 'rgba(255,255,255,0.2)' : 'transparent';
+    btn.style.color = btn.dataset.speed == '1' ? 'white' : 'rgba(255,255,255,0.5)';
+  });
+  
+  // Hide normal solar system objects
+  sun.visible = false;
+  sunGlow.visible = false;
+  asteroidBelt.visible = false;
+  kuiperBelt.visible = false;
+  planets.forEach(p => {
+    p.mesh.visible = false;
+    p.moons.forEach(m => m.mesh.visible = false);
+  });
+  
+  dustSystem.visible = true;
+  dustMat.opacity = 1.0;
+  
+  // Reset Camera
+  camera.position.set(0, 300, 600);
+  controls.target.set(0, 0, 0);
+  pinnedObject = null;
+  focusing = false;
+  
+  formationUi.style.display = 'flex';
+  formationStageText.innerText = "✨ Giant Molecular Cloud";
+  const timeCounter = document.getElementById('formation-time-counter');
+  if (timeCounter) timeCounter.innerText = "4.60 Billion Years Ago";
+});
+
+document.addEventListener('skipFormation', () => {
+  if (isFormationAnimating) formationTime = 20; 
+});
+
+document.addEventListener('toggleFormationPause', () => {
+  formationPaused = !formationPaused;
+});
+
+document.addEventListener('scrubFormation', (e) => {
+  if (isFormationAnimating) formationTime = e.detail.time;
+});
+
+document.addEventListener('changeFormationSpeed', (e) => {
+  formationSpeed = e.detail.speed;
 });
 
 // --- Controls ---
@@ -553,32 +709,207 @@ function animate() {
   requestAnimationFrame(animate);
   const delta = 0.01;
   
-  planets.forEach((p) => {
-    // Planet Position (Parametric Ellipse)
-    p.angle += p.speed * timeScale * 0.5;
-    const px = p.a * Math.cos(p.angle);
-    const pz = p.b * Math.sin(p.angle);
-    p.mesh.position.set(px, 0, pz);
-    p.mesh.rotation.y += 0.01;
+  if (isFormationAnimating) {
+    if (!formationPaused) {
+      formationTime += delta * formationSpeed;
+      const timelineSlider = document.getElementById('formation-timeline');
+      if (timelineSlider && document.activeElement !== timelineSlider) {
+        timelineSlider.value = formationTime;
+      }
+    }
     
-    // Moons Position relative to parent
-    p.moons.forEach((m) => {
-      m.angle += m.speed * timeScale;
-      const mx = p.mesh.position.x + m.data.distance * Math.cos(m.angle);
-      const mz = p.mesh.position.z + m.data.distance * Math.sin(m.angle);
-      m.mesh.position.set(mx, 0, mz);
-      m.mesh.rotation.y += 0.03;
+    const formationUi = document.getElementById('formation-ui');
+    const formationStageText = document.getElementById('formation-stage-text');
+    
+    // Continuous Morphing Logic
+    const t = formationTime / 20; // 0.0 to 1.0 progress
+    
+    // Update Stage Text with Factually Correct Timings
+    let yearsAgo = 0;
+    if (t < 0.4) {
+      yearsAgo = 4.60 - (t / 0.4) * 0.04; 
+    } else if (t < 0.7) {
+      yearsAgo = 4.56 - ((t - 0.4) / 0.3) * 0.06;
+    } else if (t < 0.9) {
+      yearsAgo = 4.50 - ((t - 0.7) / 0.2) * 0.70;
+    } else {
+      yearsAgo = 3.80 - ((t - 0.9) / 0.1) * 3.80;
+    }
+    
+    const timeCounter = document.getElementById('formation-time-counter');
+    if (timeCounter) {
+      timeCounter.innerText = yearsAgo > 0.01 ? `${yearsAgo.toFixed(2)} Billion Years Ago` : "Present Day";
+    }
+
+    if (yearsAgo > 4.56) formationStageText.innerText = "✨ Giant Molecular Cloud Collapsing";
+    else if (yearsAgo > 4.53) formationStageText.innerText = "🌀 Protoplanetary Disk Forming";
+    else if (yearsAgo > 4.50) formationStageText.innerText = "🔥 Solar Ignition & Planet Condensation";
+    else if (yearsAgo > 3.80) formationStageText.innerText = "☄️ Late Heavy Bombardment";
+    else formationStageText.innerText = "🌍 Stable Solar System";
+    
+    // Camera Cinematic Movement
+    const camX = Math.sin(t * Math.PI * 2) * (600 - t * 150);
+    const camY = 300 + t * (150 - 300);
+    const camZ = Math.cos(t * Math.PI * 2) * (600 - t * 150);
+    camera.position.set(camX, camY, camZ);
+    camera.lookAt(0,0,0);
+    
+    // Dust System Update
+    if (t < 0.9) {
+      dustSystem.visible = true;
+      const positions = dustGeo.attributes.position.array;
+      const timeOffset = Date.now() * 0.001;
+      
+      // Calculate morph weights
+      const spiralWeight = Math.min(Math.max((t - 0.1) * 3, 0), 1); // fades in from 10% to 43%
+      const ringWeight = Math.min(Math.max((t - 0.5) * 2, 0), 1);   // fades in from 50% to 100%
+      const opacityFade = Math.min(Math.max((0.9 - t) * 10, 0), 1); // fades out sharply at 90%
+      
+      dustMat.opacity = opacityFade;
+      
+      for(let i=0; i<dustCount; i++) {
+        const r0 = initialData[i*4];
+        const theta0 = initialData[i*4+1];
+        const phi0 = initialData[i*4+2];
+        const phase = initialData[i*4+3];
+        
+        // 1. Cloud Position (Base)
+        let x = r0 * Math.sin(phi0) * Math.cos(theta0 + timeOffset * 0.1);
+        let y = r0 * Math.cos(phi0);
+        let z = r0 * Math.sin(phi0) * Math.sin(theta0 + timeOffset * 0.1);
+        
+        // 2. Spiral Target
+        const spiralRadius = r0 * 0.6;
+        const spiralTheta = theta0 + spiralRadius * 0.02 + timeOffset * 0.5;
+        const spiralX = spiralRadius * Math.cos(spiralTheta);
+        const spiralY = (Math.random() - 0.5) * 40; // flatten
+        const spiralZ = spiralRadius * Math.sin(spiralTheta);
+        
+        // Morph Base -> Spiral
+        x += (spiralX - x) * spiralWeight;
+        y += (spiralY - y) * spiralWeight;
+        z += (spiralZ - z) * spiralWeight;
+        
+        // 3. Ring Target (Condensing into planets)
+        if (ringWeight > 0) {
+          const planetIndex = i % planets.length;
+          const pData = planets[planetIndex];
+          const ringRadius = pData.a * 1.5; // pull towards orbits
+          const ringTheta = spiralTheta * 2;
+          const ringX = ringRadius * Math.cos(ringTheta);
+          const ringY = Math.sin(phase + timeOffset) * 5;
+          const ringZ = ringRadius * Math.sin(ringTheta);
+          
+          x += (ringX - x) * ringWeight;
+          y += (ringY - y) * ringWeight;
+          z += (ringZ - z) * ringWeight;
+        }
+        
+        positions[i*3] = x;
+        positions[i*3+1] = y;
+        positions[i*3+2] = z;
+      }
+      dustGeo.attributes.position.needsUpdate = true;
+    } else {
+      dustSystem.visible = false;
+    }
+    
+    // Baby Planets Ignition (Shows up around 50%)
+    if (t > 0.5) {
+       sun.visible = true;
+       sunGlow.visible = true;
+       const pProgress = (t - 0.5) * 2; // 0 to 1
+       
+       planets.forEach(p => {
+           p.mesh.visible = true;
+           const scale = 0.1 + pProgress * 0.9;
+           p.mesh.scale.setScalar(scale);
+           
+           // Hot fiery colors fading to real colors
+           const origColor = p.data.texture ? new THREE.Color(0xffffff) : new THREE.Color(p.data.color);
+           const origEmissive = p.data.name === "Earth" ? new THREE.Color(0x2271b3) : new THREE.Color(p.data.color);
+           const targetIntensity = p.data.name === "Earth" ? 0.5 : 0.3;
+           
+           p.mesh.material.color.lerpColors(new THREE.Color(0xffaa00), origColor, pProgress);
+           p.mesh.material.emissive.lerpColors(new THREE.Color(0xff3300), origEmissive, pProgress);
+           p.mesh.material.emissiveIntensity = 2.0 - pProgress * (2.0 - targetIntensity);
+           
+           p.angle += p.speed * timeScale * 0.5 * (1 + (1 - pProgress)*5); // Spin faster initially
+           const px = p.a * Math.cos(p.angle);
+           const pz = p.b * Math.sin(p.angle);
+           p.mesh.position.set(px, 0, pz);
+           p.mesh.rotation.y += 0.05 * (1 - pProgress) + 0.01;
+       });
+       sun.rotation.y += 0.002;
+       const pulse = 1 + Math.sin(Date.now() * 0.001) * 0.02;
+       sunGlow.scale.setScalar(pulse);
+    }
+    
+    // Belt Formation (Shows up around 75%)
+    if (t > 0.75) {
+       asteroidBelt.visible = true;
+       kuiperBelt.visible = true;
+       const beltProgress = Math.min((t - 0.75) * 4, 1);
+       asteroidBelt.material.opacity = beltProgress * 0.8;
+       kuiperBelt.material.opacity = beltProgress * 0.8;
+    } else {
+       asteroidBelt.visible = false;
+       kuiperBelt.visible = false;
+    }
+    
+    // Stage Done
+    if (formationTime >= 20) {
+       isFormationAnimating = false;
+       formationUi.style.display = 'none';
+       dustSystem.visible = false;
+       asteroidBelt.visible = true;
+       kuiperBelt.visible = true;
+       asteroidBelt.material.opacity = 0.8;
+       kuiperBelt.material.opacity = 0.8;
+       
+       planets.forEach(p => {
+         p.mesh.scale.setScalar(1);
+         if (showMoons) {
+           p.moons.forEach(m => m.mesh.visible = true);
+         }
+         p.mesh.material.color.setHex(p.data.texture ? 0xffffff : new THREE.Color(p.data.color).getHex());
+         p.mesh.material.emissive.setHex(p.data.name === "Earth" ? 0x2271b3 : new THREE.Color(p.data.color).getHex());
+         p.mesh.material.emissiveIntensity = p.data.name === "Earth" ? 0.5 : 0.3;
+       });
+       
+       // Snap camera back to free control
+       camera.position.set(0, 150, 450);
+       controls.target.set(0,0,0);
+    }
+  } else {
+    // Normal Simulation
+    planets.forEach((p) => {
+      // Planet Position (Parametric Ellipse)
+      p.angle += p.speed * timeScale * 0.5;
+      const px = p.a * Math.cos(p.angle);
+      const pz = p.b * Math.sin(p.angle);
+      p.mesh.position.set(px, 0, pz);
+      p.mesh.rotation.y += 0.01;
+      
+      // Moons Position relative to parent
+      p.moons.forEach((m) => {
+        m.angle += m.speed * timeScale;
+        const mx = p.mesh.position.x + m.data.distance * Math.cos(m.angle);
+        const mz = p.mesh.position.z + m.data.distance * Math.sin(m.angle);
+        m.mesh.position.set(mx, 0, mz);
+        m.mesh.rotation.y += 0.03;
+      });
     });
-  });
-  
-  // Belts Animation
-  asteroidBelt.rotation.y += asteroidBelt.userData.speed;
-  kuiperBelt.rotation.y += kuiperBelt.userData.speed;
-  
-  // Sun Effects
-  sun.rotation.y += 0.002;
-  const pulse = 1 + Math.sin(Date.now() * 0.001) * 0.02;
-  sunGlow.scale.setScalar(pulse);
+    
+    // Belts Animation
+    asteroidBelt.rotation.y += asteroidBelt.userData.speed;
+    kuiperBelt.rotation.y += kuiperBelt.userData.speed;
+    
+    // Sun Effects
+    sun.rotation.y += 0.002;
+    const pulse = 1 + Math.sin(Date.now() * 0.001) * 0.02;
+    sunGlow.scale.setScalar(pulse);
+  }
 
   let uiOffset = 0;
   if (focusing) {
@@ -618,6 +949,17 @@ function animate() {
 }
 
 animate();
+
+// Hide base visual on first load so it doesn't flash before Genesis animation
+sun.visible = false;
+sunGlow.visible = false;
+planets.forEach(p => {
+  p.mesh.visible = false;
+  if (p.moons) p.moons.forEach(m => m.mesh.visible = false);
+});
+asteroidBelt.visible = false;
+kuiperBelt.visible = false;
+dustSystem.visible = true;
 
 // --- Responsive ---
 window.addEventListener('resize', () => {

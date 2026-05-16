@@ -21,13 +21,13 @@ This started as a weekend project with a very specific product brief from a very
 
 ## 🌟 Features
 
+- **Cinematic Genesis Sequence:** Watch the solar system form from a glowing molecular cloud into a swirling spiral galaxy, ending with the ignition of baby planets. Includes an interactive timeline scrubber and speed controls!
+- **24-Parameter Astronomical Database:** Deep dive into 24 accurate data points for every celestial body, neatly organized into interactive tabs (Physical, Orbital, Atmosphere & Rotation, System).
 - **Interactive 3D Navigation:** Roam the solar system with intuitive mouse controls — rotate, pan, and zoom.
-- **Realistic Planetary Data:** Live stats on mass, gravity, temperature, velocity, radius, orbital period, and day length.
-- **Dynamic Info Panels:** Tap any planet to pull up a dedicated info card with fun facts and descriptions.
+- **Dynamic Info Panels:** Tap any planet (or use the Cosmic Navigator 🔭 button) to pull up a dedicated info carousel with fun facts and tabbed data.
 - **Moons:** Toggleable rendering of all major planetary moons, each with their own data panel.
 - **Immersive Visuals:** Deep-space backdrop, realistic lighting, textured planets, and Saturn's rings — all powered by Three.js.
 - **Fullscreen Mode:** One-click fullscreen toggle for a truly immersive experience.
-- **Origin Story:** The project's backstory is baked right into the UI — hit the 👨‍👩‍👦 button anytime.
 
 ## 🚀 Tech Stack
 

@@ -1,0 +1,52 @@
+name: Daily NASA Horizons Data Sync
+
+on:
+  schedule:
+    - cron: '0 6 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Fetch Horizons data
+        run: node scripts/fetch-nasa-data.mjs
+        env:
+          NODE_OPTIONS: '--experimental-fetch'
+
+      - name: Check for changes
+        id: diff
+        run: |
+          if git diff --quiet public/planet-data.json; then
+            echo "changed=false" >> $GITHUB_OUTPUT
+          else
+            echo "changed=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create Pull Request
+        if: steps.diff.outputs.changed == 'true'
+        uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: 'chore: update planet-data.json from NASA Horizons'
+          title: 'Automated NASA Horizons data update'
+          body: |
+            This PR updates `public/planet-data.json` with fresh data from the JPL Horizons API.
+
+            Review the diff before merging to ensure parsing is correct.
+          branch: auto/nasa-sync
+          base: feature/solar-deepdive
+          delete-branch: true

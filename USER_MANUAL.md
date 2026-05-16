@@ -32,21 +32,28 @@ Navigating the 3D space is intuitive and relies on your mouse:
 ### Navigating the System
 
 *   You don't have to manually locate everything! While the Planet Info Panel is open, you can use the **previous (<)** and **next (>)** arrow buttons on the panel header to cycle through the Sun and all the planets in order of their distance from the Sun.
+*   **Cosmic Navigator Button (🔭):** Located in the UI, clicking this button acts as a quick-access shortcut to open the Planet Carousel, automatically focusing on the Sun if nothing is currently selected.
 *   The camera will automatically fly to and focus on the newly selected planet.
+
+## Cinematic Genesis Sequence
+
+Click the **✨ Solar System Genesis** button to travel back 4.6 billion years!
+*   **Continuous Cinematic Morph:** Watch as the solar system forms from a bright, glowing molecular cloud into a swirling accretion disk, and finally cools down as planets condense.
+*   **Interactive Scrubber:** Use the timeline slider at the bottom of the screen to manually scrub back and forth through the 4.6 billion years of history.
+*   **Playback Controls:** You can pause/play the animation at any time, or use the 1x, 2x, and 4x speed toggles to fast-forward the formation of the solar system.
 
 ## Visual Toggles
 
 *   **Show Moons Switch:** Located at the bottom center of your screen, this toggle allows you to hide or show the 3D models and orbits of the moons in the simulation. 
     *   *Note:* Turning this off purely removes the 3D meshes to declutter your screen. You can still access full moon data via the UI panels seamlessly!
 
-## Understanding the Data
+## Understanding the Data (24 Parameters)
 
-The information panels provide a curated selection of properties for each celestial body, including:
-*   Mass & Gravity
-*   Surface Temperature
-*   Orbital Velocity & Period
-*   Day Length
-*   Equatorial Radius
-*   Fun Facts & Descriptions
+The information panels now contain a comprehensive database of 24 highly accurate astronomical parameters for every celestial body! To save screen real-estate, these parameters are organized into interactive tabs:
+
+*   **Physical:** Mass, Volume, Equatorial/Polar Radius, Density, Surface Gravity, Escape Velocity.
+*   **Orbital:** Mean Distance, Periapsis, Apoapsis, Orbital Period, Orbital Velocity, Eccentricity, Inclination.
+*   **Atmos & Rot:** Day Length, Axial Tilt, Mean Temperature, Surface Pressure, Main Atmospheric Components.
+*   **System:** Number of Moons, Ring System Presence, Global Magnetic Field, Discoverer, Discovery Date.
 
 Enjoy your journey through the cosmos!
