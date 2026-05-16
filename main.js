@@ -567,7 +567,7 @@ document.addEventListener('startFormation', () => {
   camera.position.set(0, 300, 600); controls.target.set(0, 0, 0);
   pinnedObject = null; focusing = false;
   formationUi.style.display = 'flex';
-  formationStageText.innerText = "✨ Giant Molecular Cloud";
+  if (formationStageText) formationStageText.innerText = "✨ Giant Molecular Cloud";
 });
 
 document.addEventListener('skipFormation', () => { if (isFormationAnimating) formationTime = 20; });
@@ -586,6 +586,7 @@ document.addEventListener('changeFormationSpeed', (e) => { formationSpeed = e.de
 function updateTrail(trail, x, z) {
   const attr = trail.line.geometry.attributes.position;
   const arr = attr.array;
+  if (isNaN(x) || isNaN(z)) return;
   trail.positions.push(x, 0, z);
   if (trail.positions.length > trailMaxPoints * 3) trail.positions.splice(0, 3);
   const count = Math.min(trail.positions.length / 3, trailMaxPoints);
@@ -718,6 +719,16 @@ function animate() {
     if (t < 0.4) yearsAgo = 4.60 - (t / 0.4) * 0.04; else if (t < 0.7) yearsAgo = 4.56 - ((t - 0.4) / 0.3) * 0.06; else if (t < 0.9) yearsAgo = 4.50 - ((t - 0.7) / 0.2) * 0.70; else yearsAgo = 3.80 - ((t - 0.9) / 0.1) * 3.80;
     const timeCounter = document.getElementById('formation-time-counter'); if (timeCounter) timeCounter.innerText = yearsAgo > 0.01 ? `${yearsAgo.toFixed(2)} Billion Years Ago` : "Present Day";
     
+    const stageText = document.getElementById('formation-stage-text');
+    if (stageText) {
+      if (t < 0.2) stageText.innerText = "✨ Giant Molecular Cloud";
+      else if (t < 0.4) stageText.innerText = "🌪️ Gravitational Collapse";
+      else if (t < 0.6) stageText.innerText = "⚛️ Protostar Formation";
+      else if (t < 0.8) stageText.innerText = "🪐 Protoplanetary Disk";
+      else if (t < 0.95) stageText.innerText = "☄️ Heavy Bombardment";
+      else stageText.innerText = "🌞 Stable Solar System";
+    }
+    
     // Sync Runner position & state
     const runner = document.getElementById('timeline-runner');
     if (runner) {
@@ -834,7 +845,8 @@ function animate() {
   targetViewOffsetX = uiOffset;
   if (Math.abs(targetViewOffsetX - currentViewOffsetX) > 0.5) { currentViewOffsetX += (targetViewOffsetX - currentViewOffsetX) * 0.1; camera.setViewOffset(window.innerWidth, window.innerHeight, currentViewOffsetX, 0, window.innerWidth, window.innerHeight); } else if (currentViewOffsetX !== 0 && targetViewOffsetX === 0) { currentViewOffsetX = 0; camera.clearViewOffset(); }
   if (focusing && focusData) focusOnObject(focusData); else if (resettingToDefault) { controls.target.lerp(new THREE.Vector3(0,0,0), 0.05); camera.position.lerp(new THREE.Vector3(0,150,450), 0.05); if (controls.target.distanceTo(new THREE.Vector3(0,0,0)) < 0.1) resettingToDefault = false; }
-  controls.update(); renderer.render(scene, camera);
+  if (!isFormationAnimating && !isVoyagerMode) controls.update();
+  renderer.render(scene, camera);
 }
 animate();
 
@@ -938,5 +950,5 @@ window.addEventListener('resize', () => {
   camera.updateProjectionMatrix(); renderer.setSize(window.innerWidth, window.innerHeight);        
 });
 
-// Start Genesis formation on load
-document.dispatchEvent(new Event('startFormation'));
+// Start animation loop
+animate();
