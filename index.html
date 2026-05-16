@@ -137,6 +137,64 @@
       }
       button:hover { background: rgba(255,255,255,0.2); border-color: var(--accent-color); }
 
+      /* ── Floating Action Buttons ── */
+      #fab-container {
+        position: fixed;
+        bottom: 2.5rem;
+        left: 2rem;
+        display: flex;
+        flex-direction: row;
+        gap: 1rem;
+        z-index: 200;
+        pointer-events: auto;
+      }
+
+      .fab {
+        width: 64px; height: 64px;
+        border-radius: 50%;
+        border: 2px solid rgba(255, 255, 255, 0.2);
+        background: rgba(10, 10, 40, 0.7);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        color: white;
+        font-size: 1.6rem;
+        cursor: pointer;
+        display: flex; align-items: center; justify-content: center;
+        transition: all 0.25s ease;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+        padding: 0;
+        width: 64px; /* override global button width:100% */
+        position: relative;
+      }
+      .fab:hover {
+        transform: scale(1.12) translateY(-3px);
+        border-color: var(--accent-color);
+        box-shadow: 0 8px 30px rgba(74, 144, 226, 0.45);
+        background: rgba(74, 144, 226, 0.2);
+      }
+      .fab:hover .fab-tooltip {
+        opacity: 1;
+        transform: translateY(-8px);
+      }
+      .fab-tooltip {
+        position: absolute;
+        bottom: calc(100% + 10px);
+        left: 50%;
+        transform: translateX(-50%) translateY(0);
+        background: rgba(10,10,40,0.95);
+        border: 1px solid rgba(255,255,255,0.2);
+        color: #fff;
+        font-size: 0.72rem;
+        font-weight: 600;
+        white-space: nowrap;
+        padding: 4px 10px;
+        border-radius: 8px;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.2s ease, transform 0.2s ease;
+        letter-spacing: 0.04em;
+      }
+
       #controls-hint {
         text-align: center; color: var(--text-secondary); font-size: 0.8rem;
         padding: 0.5rem 1.5rem; background: rgba(0,0,0,0.4);
@@ -432,6 +490,19 @@
           </div>
         </div>
       </div>
+
+      <!-- ── Floating Action Buttons ── -->
+      <div id="fab-container">
+        <button class="fab" id="fab-navigator" title="Cosmic Navigator">
+          🔭
+          <span class="fab-tooltip">Cosmic Navigator</span>
+        </button>
+        <button class="fab" id="fab-genesis" title="Solar System Genesis">
+          ✨
+          <span class="fab-tooltip">Solar System Genesis</span>
+        </button>
+      </div>
+
       <div id="formation-ui" style="display:none; position:absolute; bottom:30px; left:50%; transform:translateX(-50%); width:90%; max-width:700px; z-index:10; background:rgba(10,10,30,0.85); padding:20px; border-radius:24px; color:white; font-family:'Outfit', sans-serif; pointer-events:auto; border:1px solid rgba(100,180,255,0.3); backdrop-filter:blur(15px); flex-direction:column; gap:15px; box-shadow:0 10px 40px rgba(0,0,0,0.6);">
         
         <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -491,6 +562,18 @@
 
         launchBtn.addEventListener('click', dismiss);
         reopenBtn.addEventListener('click', reopen);
+
+        // ── Floating Action Buttons ──
+        document.getElementById('fab-navigator').addEventListener('click', () => {
+          document.dispatchEvent(new CustomEvent('openPlanetCarousel'));
+        });
+
+        document.getElementById('fab-genesis').addEventListener('click', () => {
+          // Reset and re-run the formation animation
+          document.dispatchEvent(new Event('startFormation'));
+          const formationUiEl = document.getElementById('formation-ui');
+          if (formationUiEl) formationUiEl.style.display = 'flex';
+        });
         autoTimer = setTimeout(dismiss, 15000);
 
         document.getElementById('skip-formation-btn').addEventListener('click', () => {

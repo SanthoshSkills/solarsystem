@@ -1,60 +1,131 @@
-# Solar System Simulator - User Manual
+# 🪐 Solar System Simulator — User Manual
 
-Welcome to the 3D Solar System Simulator! This application provides an interactive, detailed, and realistic 3D representation of our solar system right in your browser.
+Welcome, young explorer! This guide will help you navigate our interactive 3D Solar System Simulator. Whether you're 7 or 70, there's something incredible to discover here.
 
-## Getting Started
+---
 
-When you launch the simulator, you will initially be presented with a wide view of the entire solar system, centered on the Sun. The simulation is running in real-time, meaning planets are actively moving along their orbital paths based on relatively scaled speeds.
+## 🚀 First Launch — The Origin Story
 
-## Camera Controls
+When you first open the simulator, you'll be greeted by a short **intro card** that explains the story behind this project — a dad, a 7-year-old, and an AI coding assistant! 
 
-Navigating the 3D space is intuitive and relies on your mouse:
+- The card will auto-dismiss after 15 seconds, OR you can click the big **"Explore the Universe →"** button to jump straight in.
+- Clicking that button immediately launches the **Solar System Genesis cinematic animation** (see below).
+- You can re-open this origin card any time by clicking the **👨‍👩‍👦 button** in the top header.
 
-*   **Rotate View (Orbit):** Click and hold the **Left Mouse Button** anywhere in the empty space, then drag to orbit the camera around the currently focused object or the center of the solar system.
-*   **Pan Camera:** Click and hold the **Right Mouse Button**, then drag to laterally move (pan) your camera perspective without rotating.
-*   **Zoom In / Out:** Use your **Mouse Scroll Wheel** to zoom closer to the celestial bodies or zoom out for a macro view of the solar system.
+---
 
-## Interaction & Exploration
+## 🎬 Solar System Genesis Animation
 
-### Interacting with Planets and the Sun
+As soon as you enter the simulator, a cinematic sequence begins, taking you back **4.6 billion years** to watch our solar system form from scratch!
 
-*   **Hovering:** If your view isn't currently locked to a planet, simply hovering your mouse cursor over any planet (or the Sun) will briefly highlight it and pop open the **Planet Info Panel**.
-*   **Selecting (Pinning):** To lock the camera onto a planet and track it through space, **Left Click** on it. 
-    *   *Smart Camera Shift:* When a planet is selected and the information panel opens, the camera intelligently pans the planet slightly to the left portion of your screen so it remains clearly visible alongside the UI panel.
-*   **Deselecting:** You can unlock your view by clicking the **Close** button at the bottom of the Planet Info Panel. This will safely close any open moon info panels and elegantly reset your camera back to a wide, cinematic viewpoint showcasing the entire solar system. Clicking on the empty background space will no longer accidentally unpin your camera.
+### What you'll see:
 
-### Discovering Moons
+| Stage | Time | What's Happening |
+|---|---|---|
+| ✨ Giant Molecular Cloud Collapsing | 4.60 – 4.56 Bya | A glowing cosmic dust cloud begins to collapse under gravity |
+| 🌀 Protoplanetary Disk Forming | 4.56 – 4.53 Bya | The cloud flattens into a spinning disk around the infant Sun |
+| 🔥 Solar Ignition & Planet Condensation | 4.53 – 4.50 Bya | The Sun ignites! Planets begin clumping together |
+| ☄️ Late Heavy Bombardment | 4.50 – 3.80 Bya | Asteroids and comets slam into the young planets |
+| 🌍 Stable Solar System | 3.80 Bya – Present | The solar system settles into the familiar orbits we know today |
 
-*   **Moon Info Panel:** If you select a planet that has moons (like Earth, Mars, Jupiter, etc.), the **Moon Info Panel** will open automatically by default, showcasing details about its most prominent moon.
-*   **Selecting Specific Moons:** Inside the Planet Info Panel, you will see a list of "Major Moons". You can click on any of these underlined names to instantly pull up its targeted data.
-*   **Navigating Moons:** While the Moon Info Panel is open, use the **previous (<)** and **next (>)** arrows at the top of the panel to cycle through all the major moons belonging to the currently selected planet.
+> **Note:** The timeline is non-linear by design, so the animation spends more time on the dramatic early formation stages.
 
-### Navigating the System
+### Controls during the animation:
 
-*   You don't have to manually locate everything! While the Planet Info Panel is open, you can use the **previous (<)** and **next (>)** arrow buttons on the panel header to cycle through the Sun and all the planets in order of their distance from the Sun.
-*   **Cosmic Navigator Button (🔭):** Located in the UI, clicking this button acts as a quick-access shortcut to open the Planet Carousel, automatically focusing on the Sun if nothing is currently selected.
-*   The camera will automatically fly to and focus on the newly selected planet.
+| Button | Action |
+|--------|--------|
+| ⏸️ / ▶️ | Pause or resume the animation |
+| Timeline slider | Drag to scrub forwards/backwards through 4.6 billion years |
+| **1x / 2x / 4x** | Change playback speed |
+| **Skip to Present ⏭️** | Jump straight to today's solar system |
 
-## Cinematic Genesis Sequence
+---
 
-Click the **✨ Solar System Genesis** button to travel back 4.6 billion years and watch the breathtaking birth of our solar system!
-*   **Continuous Cinematic Morph:** Watch as the solar system forms from a bright, glowing molecular cloud into a swirling accretion disk, and finally cools down as planets condense.
-*   **Scientifically Accurate Timeline:** The timeline is non-linear to reflect true astronomical history! It heavily focuses on the turbulent first 100 million years where the solar nebula collapsed, the sun ignited, and planets rapidly condensed, followed by the Late Heavy Bombardment, eventually settling into the stable solar system we see today.
-*   **Interactive Scrubber:** Use the timeline slider at the bottom of the screen to manually scrub back and forth through the 4.6 billion years of history. Watch the text dynamically update to tell you exactly what stage of formation you are witnessing.
-*   **Playback Controls:** You can pause/play the animation at any time, or use the 1x, 2x, and 4x speed toggles to fast-forward the formation of the solar system.
+## 🌌 Floating Action Buttons
 
-## Visual Toggles
+Two circular buttons sit in the **bottom-left corner** of the screen at all times:
 
-*   **Show Moons Switch:** Located at the bottom center of your screen, this toggle allows you to hide or show the 3D models and orbits of the moons in the simulation. 
-    *   *Note:* Turning this off purely removes the 3D meshes to declutter your screen. You can still access full moon data via the UI panels seamlessly!
+### 🔭 Cosmic Navigator
+Opens the **Planet Info Carousel** and focuses the camera on the **Sun**. Use this as your home base — from here you can browse every planet using the arrow buttons.
 
-## Understanding the Data (24 Parameters)
+### ✨ Solar System Genesis
+Replays the full **4.6 billion year formation cinematic** from the beginning. Great for watching it again or showing a friend!
 
-The information panels now contain a comprehensive database of 24 highly accurate astronomical parameters for every celestial body! To save screen real-estate, these parameters are organized into interactive tabs:
+---
 
-*   **Physical:** Mass, Volume, Equatorial/Polar Radius, Density, Surface Gravity, Escape Velocity.
-*   **Orbital:** Mean Distance, Periapsis, Apoapsis, Orbital Period, Orbital Velocity, Eccentricity, Inclination.
-*   **Atmos & Rot:** Day Length, Axial Tilt, Mean Temperature, Surface Pressure, Main Atmospheric Components.
-*   **System:** Number of Moons, Ring System Presence, Global Magnetic Field, Discoverer, Discovery Date.
+## 🖱️ Camera Controls
 
-Enjoy your journey through the cosmos!
+Navigate the 3D space with your mouse:
+
+| Action | Control |
+|--------|---------|
+| Rotate / Orbit | Left click + drag |
+| Pan | Right click + drag |
+| Zoom in / out | Scroll wheel |
+
+---
+
+## 🌍 Exploring Planets & the Sun
+
+### Hovering
+Move your mouse over any planet or the Sun to highlight it. The **Planet Info Panel** will slide open on the right side of your screen.
+
+### Selecting / Pinning
+**Left-click** on any planet or the Sun to lock the camera onto it. The camera will smartly shift the planet slightly left so it stays visible alongside the info panel.
+
+### Deselecting
+Click the **Close** button at the bottom of the Planet Info Panel to release the camera and return to a wide view of the full solar system.
+
+---
+
+## 📋 Planet Info Panel — 24 Scientific Parameters
+
+When you select any planet (or the Sun), the **Planet Info Panel** opens on the right side. It contains **24 accurate astronomical parameters** organised into 4 selectable tabs:
+
+| Tab | Parameters Included |
+|-----|---------------------|
+| **Physical** | Mass, Volume, Equatorial Radius, Polar Radius, Density, Surface Gravity, Escape Velocity |
+| **Orbital** | Mean Distance, Periapsis, Apoapsis, Orbital Period, Orbital Velocity, Eccentricity, Inclination |
+| **Atmosphere & Rotation** | Day Length, Axial Tilt, Mean Temperature, Surface Pressure, Atmosphere composition |
+| **System** | Number of Moons, Ring System, Global Magnetic Field, Discoverer, Discovery Date |
+
+Below the tabs you'll also find a **fun fact** and a short **description** of each body.
+
+---
+
+## 🌙 Discovering Moons
+
+If a planet has moons, the **Moon Info Panel** will automatically open alongside the planet panel, showing details about its first moon.
+
+- **Click any moon name** in the "Major Moons" list inside the planet panel to switch the moon panel to that moon.
+- Use the **◀ / ▶ arrow buttons** at the top of the moon panel to cycle through all of a planet's major moons.
+- The Moon Info Panel also has the same **4-tab, 24-parameter** layout.
+
+---
+
+## 🔄 Navigating Between Bodies
+
+- Use the **◀ / ▶ arrow buttons** in the planet panel's title bar to cycle through the Sun and all 8 planets in order.
+- The camera flies automatically to the newly selected body.
+- Or use the **🔭 Cosmic Navigator** button (bottom-left) to jump straight to the Sun and start from there.
+
+---
+
+## 👁️ Visual Toggles
+
+| Toggle | Location | What it does |
+|--------|----------|--------------|
+| **Show Moons** switch | Bottom-centre bar | Hides or shows the 3D moon models in the scene (data panels still work!) |
+
+---
+
+## 🔖 Other Controls
+
+| Button | Where | What it does |
+|--------|-------|--------------|
+| 📖 User Manual | Top header | Opens this user manual in a new tab |
+| 👨‍👩‍👦 | Top header | Re-opens the origin story card |
+
+---
+
+Enjoy your journey through the cosmos! 🚀
