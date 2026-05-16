@@ -37,9 +37,10 @@ Navigating the 3D space is intuitive and relies on your mouse:
 
 ## Cinematic Genesis Sequence
 
-Click the **✨ Solar System Genesis** button to travel back 4.6 billion years!
+Click the **✨ Solar System Genesis** button to travel back 4.6 billion years and watch the breathtaking birth of our solar system!
 *   **Continuous Cinematic Morph:** Watch as the solar system forms from a bright, glowing molecular cloud into a swirling accretion disk, and finally cools down as planets condense.
-*   **Interactive Scrubber:** Use the timeline slider at the bottom of the screen to manually scrub back and forth through the 4.6 billion years of history.
+*   **Scientifically Accurate Timeline:** The timeline is non-linear to reflect true astronomical history! It heavily focuses on the turbulent first 100 million years where the solar nebula collapsed, the sun ignited, and planets rapidly condensed, followed by the Late Heavy Bombardment, eventually settling into the stable solar system we see today.
+*   **Interactive Scrubber:** Use the timeline slider at the bottom of the screen to manually scrub back and forth through the 4.6 billion years of history. Watch the text dynamically update to tell you exactly what stage of formation you are witnessing.
 *   **Playback Controls:** You can pause/play the animation at any time, or use the 1x, 2x, and 4x speed toggles to fast-forward the formation of the solar system.
 
 ## Visual Toggles
