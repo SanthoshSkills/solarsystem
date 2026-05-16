@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { planetsData, sunData } from './planets.js';
+import { getVoyagerTimeline, getVoyagerDateRange, getVoyagerState, getAllPlanetPositions, formatVoyagerDate } from './voyager.js';
 
 // --- Configuration ---
 const sunSize = 5;
@@ -126,6 +127,18 @@ scene.add(asteroidBelt);
 const kuiperBelt = createBelt(10000, 150, 260, 0x99ccff, 0.00005);
 scene.add(kuiperBelt);
 
+// --- Voyager Mode State ---
+let isVoyagerMode = false;
+let voyagerTime = 0;
+let voyagerSpeed = 1;
+let voyagerPaused = false;
+let voyagerCraftId = 2; // Voyager 2 (more flybys)
+let voyagerCraftMesh = null;
+let voyagerTrailLine = null;
+let voyagerTrailPositions = [];
+let voyagerLastFlyby = '';
+let voyagerCockpitView = false;
+
 // --- Formation Cinematic Assets ---
 let isFormationAnimating = false;
 let formationTime = 0;
@@ -188,6 +201,87 @@ const dustMat = new THREE.PointsMaterial({
 const dustSystem = new THREE.Points(dustGeo, dustMat);
 dustSystem.visible = false;
 scene.add(dustSystem);
+
+// --- Voyager Spacecraft Meshes ---
+function createVoyagerCraft() {
+  const group = new THREE.Group();
+  // Body
+  const bodyGeo = new THREE.BoxGeometry(1.2, 0.6, 0.8);
+  const bodyMat = new THREE.MeshStandardMaterial({ color: 0x888888, metalness: 0.7, roughness: 0.3, emissive: 0x004466, emissiveIntensity: 0.3 });
+  const body = new THREE.Mesh(bodyGeo, bodyMat);
+  group.add(body);
+  // Antenna dish
+  const dishGeo = new THREE.SphereGeometry(0.5, 16, 12, 0, Math.PI * 2, 0, Math.PI * 0.5);
+  const dishMat = new THREE.MeshStandardMaterial({ color: 0xcccccc, metalness: 0.9, roughness: 0.1, side: THREE.DoubleSide });
+  const dish = new THREE.Mesh(dishGeo, dishMat);
+  dish.rotation.x = Math.PI / 2;
+  dish.position.set(0, 0.4, -0.4);
+  group.add(dish);
+  // Boom arms (simple lines)
+  const boomMat = new THREE.LineBasicMaterial({ color: 0xaaaaaa });
+  for (let side = -1; side <= 1; side += 2) {
+    const pts = [new THREE.Vector3(side * 0.3, 0, 0.3), new THREE.Vector3(side * 1.2, 0, 0.8)];
+    const boomGeo = new THREE.BufferGeometry().setFromPoints(pts);
+    const boom = new THREE.Line(boomGeo, boomMat);
+    group.add(boom);
+  }
+  // Glow point (RTG glow)
+  const glowGeo = new THREE.SphereGeometry(0.3, 8, 8);
+  const glowMat = new THREE.MeshBasicMaterial({ color: 0xff6600, transparent: true, opacity: 0.6 });
+  const glow = new THREE.Mesh(glowGeo, glowMat);
+  glow.position.set(0, -0.2, 0.5);
+  group.add(glow);
+  group.scale.setScalar(0.5);
+  return group;
+}
+
+const voyagerCraft1 = createVoyagerCraft();
+voyagerCraft1.visible = false;
+scene.add(voyagerCraft1);
+const voyagerCraft2 = createVoyagerCraft();
+voyagerCraft2.visible = false;
+scene.add(voyagerCraft2);
+
+// Voyager trajectory trails (both crafts always visible)
+const trailMaxPoints = 200;
+const rocketMaxPoints = 50;
+function createRocketTexture(stripeColor) {
+  const c = document.createElement('canvas');
+  c.width = 32; c.height = 40;
+  const x = c.getContext('2d');
+  x.clearRect(0, 0, 32, 40);
+  x.fillStyle = '#f80'; x.beginPath(); x.moveTo(16,38); x.lineTo(8,28); x.lineTo(24,28); x.closePath(); x.fill();
+  x.fillStyle = '#ff0'; x.beginPath(); x.moveTo(16,35); x.lineTo(11,28); x.lineTo(21,28); x.closePath(); x.fill();
+  x.fillStyle = '#fff'; x.beginPath(); x.moveTo(16,2); x.lineTo(6,28); x.lineTo(26,28); x.closePath(); x.fill();
+  x.fillStyle = stripeColor; x.fillRect(7,10,18,3); x.fillRect(7,18,18,3);
+  x.fillStyle = '#4af'; x.beginPath(); x.arc(16,8,3,0,Math.PI*2); x.fill();
+  x.fillStyle = 'rgba(255,255,255,0.3)'; x.beginPath(); x.arc(15,7,1,0,Math.PI*2); x.fill();
+  return new THREE.CanvasTexture(c);
+}
+const rocketTexV2 = createRocketTexture('#d4af37');
+const rocketTexV1 = createRocketTexture('#ff8800');
+
+function makeTrail(color, tex) {
+  const arr = new Float32Array(trailMaxPoints * 3);
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute('position', new THREE.BufferAttribute(arr, 3));
+  geo.setDrawRange(0, 0);
+  const mat = new THREE.LineBasicMaterial({ color, transparent: true, opacity: 0.4 });
+  const line = new THREE.Line(geo, mat);
+  line.visible = false;
+  scene.add(line);
+  const rArr = new Float32Array(rocketMaxPoints * 3);
+  const rGeo = new THREE.BufferGeometry();
+  rGeo.setAttribute('position', new THREE.BufferAttribute(rArr, 3));
+  const rMat = new THREE.PointsMaterial({ size: 1.5, map: tex, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, opacity: 0.6 });
+  const rPoints = new THREE.Points(rGeo, rMat);
+  rPoints.visible = false;
+  scene.add(rPoints);
+  return { line, rPoints, positions: [] };
+}
+
+const trailV1 = makeTrail(0xff8800, rocketTexV1);
+const trailV2 = makeTrail(0xd4af37, rocketTexV2);
 
 // --- Planets & Moons ---
 const planets = [];
@@ -626,15 +720,18 @@ document.getElementById('next-moon-btn').addEventListener('click', (e) => {
 });
 
 // Moon Toggle Logic
-document.getElementById('toggle-moons').addEventListener('change', (e) => {
-  showMoons = e.target.checked;
-  planets.forEach(p => {
-    p.moons.forEach(m => {
-      m.mesh.visible = showMoons && !isFormationAnimating;
+const moonToggle = document.getElementById('toggle-moons');
+if (moonToggle) {
+  moonToggle.addEventListener('change', (e) => {
+    showMoons = e.target.checked;
+    planets.forEach(p => {
+      if (p.moons) p.moons.forEach(m => {
+        m.mesh.visible = showMoons && !isFormationAnimating;
+      });
     });
+    updateTargets();
   });
-  updateTargets();
-});
+}
 
 // Formation Event Listener
 document.addEventListener('startFormation', () => {
@@ -687,6 +784,7 @@ document.addEventListener('skipFormation', () => {
 });
 
 document.addEventListener('toggleFormationPause', () => {
+  if (!isFormationAnimating) return;
   formationPaused = !formationPaused;
 });
 
@@ -697,6 +795,207 @@ document.addEventListener('scrubFormation', (e) => {
 document.addEventListener('changeFormationSpeed', (e) => {
   formationSpeed = e.detail.speed;
 });
+
+function updateTrail(trail, x, z) {
+  const attr = trail.line.geometry.attributes.position;
+  const arr = attr.array;
+  trail.positions.push(x, 0, z);
+  if (trail.positions.length > trailMaxPoints * 3) trail.positions.splice(0, 3);
+  const count = Math.min(trail.positions.length / 3, trailMaxPoints);
+  for (let i = 0; i < count * 3; i++) arr[i] = trail.positions[i];
+  trail.line.geometry.setDrawRange(0, count);
+  attr.needsUpdate = true;
+  const rAttr = trail.rPoints.geometry.attributes.position;
+  const rArr = rAttr.array;
+  const rocketCount = Math.min(Math.floor(count / 4), rocketMaxPoints);
+  for (let i = 0; i < rocketCount; i++) {
+    const ti = i * 4 * 3;
+    rArr[i * 3] = arr[ti];
+    rArr[i * 3 + 1] = arr[ti + 1] + 0.3;
+    rArr[i * 3 + 2] = arr[ti + 2];
+  }
+  trail.rPoints.geometry.setDrawRange(0, rocketCount);
+  rAttr.needsUpdate = true;
+}
+
+// ── Voyager Mode Event Listeners ──
+document.addEventListener('startVoyagerMode', () => {
+  isVoyagerMode = true;
+  isFormationAnimating = false;
+  formationTime = 20;
+  voyagerTime = 0;
+  voyagerSpeed = 1;
+  voyagerPaused = false;
+  voyagerCockpitView = false;
+  trailV1.positions = [];
+  trailV2.positions = [];
+
+  // Hide formation UI
+  const formationUi = document.getElementById('formation-ui');
+  if (formationUi) formationUi.style.display = 'none';
+
+  // Show normal solar system
+  sun.visible = true;
+  sunGlow.visible = true;
+  asteroidBelt.visible = true;
+  kuiperBelt.visible = true;
+  asteroidBelt.material.opacity = 0.8;
+  kuiperBelt.material.opacity = 0.8;
+  dustSystem.visible = false;
+  planets.forEach(p => {
+    p.mesh.visible = true;
+    p.mesh.scale.setScalar(1);
+    p.mesh.material.color.setHex(p.data.texture ? 0xffffff : new THREE.Color(p.data.color).getHex());
+    p.mesh.material.emissive.setHex(p.data.name === "Earth" ? 0x2271b3 : new THREE.Color(p.data.color).getHex());
+    p.mesh.material.emissiveIntensity = p.data.name === "Earth" ? 0.5 : 0.3;
+  });
+
+  // Show moons
+  planets.forEach(p => {
+    if (p.moons) p.moons.forEach(m => m.mesh.visible = showMoons);
+  });
+
+  // Setup craft
+  voyagerCraftId = 2;
+  voyagerEventDotsBuilt = false;
+
+  // Badge Initialization
+  const badge = document.getElementById('voyager-badge');
+  const badgeStart = document.getElementById('voyager-badge-start');
+  const range = getVoyagerDateRange(voyagerCraftId);
+  if (badge) badge.style.display = 'block';
+  if (badgeStart) badgeStart.innerText = new Date(range.startMs).getFullYear();
+
+  updateVoyagerCraftVisibility();
+  updateVoyagerCraftButtons();
+  rebuildVoyagerFlybyTrack();
+
+  // Reset camera
+  camera.position.set(0, 60, 200);
+  controls.target.set(0, 0, 0);
+
+  // Show both trails and rocket markers
+  trailV1.line.visible = true;
+  trailV1.rPoints.visible = true;
+  trailV2.line.visible = true;
+  trailV2.rPoints.visible = true;
+  syncVoyagerImageHeight();
+
+  // Hide planet info panels
+  pinnedObject = null;
+  focusing = false;
+  planetInfo.style.opacity = '0';
+  planetInfo.style.pointerEvents = 'none';
+  planetInfo.style.transform = 'translateY(-20px)';
+  hideMoonInfo();
+
+  voyagerLastFlyby = '';
+
+  // Update FAB to show cockpit toggle
+  const fab = document.getElementById('fab-voyager');
+  const closeFab = document.getElementById('fab-voyager-close');
+  if (fab) { 
+    fab.dataset.voyagerActive = 'true'; 
+    const icon = fab.querySelector('.fab-icon');
+    if (icon) icon.textContent = '🎮'; 
+    fab.title = 'Toggle Cockpit View'; 
+    fab.style.background = 'rgba(0,200,255,0.2)'; 
+    fab.style.borderColor = 'rgba(0,200,255,0.4)'; 
+  }
+  if (closeFab) closeFab.style.display = 'flex';
+
+  // Populate flyby track
+  rebuildVoyagerFlybyTrack();
+});
+
+document.addEventListener('toggleVoyagerPause', () => {
+  if (!isVoyagerMode) return;
+  voyagerPaused = !voyagerPaused;
+});
+
+document.addEventListener('scrubVoyager', (e) => {
+  if (isVoyagerMode) voyagerTime = e.detail.time;
+});
+
+document.addEventListener('changeVoyagerSpeed', (e) => {
+  voyagerSpeed = e.detail.speed;
+});
+
+document.addEventListener('switchVoyagerCraft', (e) => {
+  if (!isVoyagerMode) return;
+  const newCraftId = e.detail.craft;
+  if (newCraftId === voyagerCraftId) return;
+
+  // Preserve the same date
+  const oldRange = getVoyagerDateRange(voyagerCraftId);
+  const currentDateMs = oldRange.startMs + voyagerTime * (oldRange.endMs - oldRange.startMs);
+  
+  voyagerCraftId = newCraftId;
+  const newRange = getVoyagerDateRange(voyagerCraftId);
+  
+  // Calculate new normalized time t for the target craft
+  let newT = (currentDateMs - newRange.startMs) / (newRange.endMs - newRange.startMs);
+  voyagerTime = Math.max(0, Math.min(1, newT));
+  
+  voyagerPaused = false;
+  voyagerEventDotsBuilt = false;
+  
+  const badgeStart = document.getElementById('voyager-badge-start');
+  if (badgeStart) badgeStart.innerText = new Date(newRange.startMs).getFullYear();
+
+  const switchFab = document.getElementById('fab-voyager-switch');
+  if (switchFab) switchFab.innerText = voyagerCraftId === 1 ? 'V2' : 'V1';
+
+  updateVoyagerCraftVisibility();
+  updateVoyagerCraftButtons();
+  rebuildVoyagerFlybyTrack();
+});
+
+document.addEventListener('toggleVoyagerCockpit', () => {
+  voyagerCockpitView = !voyagerCockpitView;
+  const fab = document.getElementById('fab-voyager');
+  if (voyagerCockpitView) {
+    if (fab) { fab.style.background = 'rgba(0,200,255,0.3)'; fab.style.borderColor = 'rgba(0,200,255,0.6)'; }
+  } else {
+    if (fab) { fab.style.background = 'rgba(0,200,255,0.2)'; fab.style.borderColor = 'rgba(0,200,255,0.4)'; }
+  }
+  syncVoyagerImageHeight();
+});
+
+document.addEventListener('closeVoyagerMode', () => {
+  isVoyagerMode = false;
+  voyagerCockpitView = false;
+  voyagerEventDotsBuilt = false;
+  voyagerLastFlyby = '';
+
+  const fab = document.getElementById('fab-voyager');
+  const closeFab = document.getElementById('fab-voyager-close');
+  const badge = document.getElementById('voyager-badge');
+
+  if (fab) { 
+    fab.dataset.voyagerActive = 'false'; 
+    const icon = fab.querySelector('.fab-icon');
+    if (icon) icon.textContent = '🛸'; 
+    fab.title = 'Voyager Mission'; 
+    fab.style.background = ''; 
+    fab.style.borderColor = ''; 
+  }
+  if (closeFab) closeFab.style.display = 'none';
+  if (badge) badge.style.display = 'none';
+
+  trailV1.line.visible = false;
+  trailV1.rPoints.visible = false;
+  trailV2.line.visible = false;
+  trailV2.rPoints.visible = false;
+  updateVoyagerCraftVisibility();
+  updateVoyagerCraftButtons();
+  rebuildVoyagerFlybyTrack();
+});
+
+function updateVoyagerCraftVisibility() {
+  voyagerCraft1.visible = isVoyagerMode;
+  voyagerCraft2.visible = isVoyagerMode;
+}
 
 // --- Controls ---
 const controls = new OrbitControls(camera, renderer.domElement);
@@ -941,6 +1240,159 @@ function animate() {
        camera.position.set(0, 150, 450);
        controls.target.set(0,0,0);
     }
+  } else if (isVoyagerMode) {
+    // â”€â”€ Voyager Mode Animation â”€â”€
+    if (!voyagerPaused) {
+      voyagerTime += delta * voyagerSpeed * 0.05;
+      if (voyagerTime >= 1) {
+        voyagerTime = 1;
+        voyagerPaused = true;
+        document.dispatchEvent(new Event('closeVoyagerMode'));
+        // Continue rendering this frame, next frame will be baseline
+      }
+    }
+
+    const state = getVoyagerState(voyagerTime, voyagerCraftId);
+    const stateV1 = getVoyagerState(voyagerTime, 1);
+    const stateV2 = getVoyagerState(voyagerTime, 2);
+    if (!state) { controls.update(); renderer.render(scene, camera); return; }
+
+    // Update Badge Countdown
+    const badge = document.getElementById('voyager-badge');
+    const badgeCurrent = document.getElementById('voyager-badge-current');
+    if (badge) badge.style.display = 'block';
+    if (badgeCurrent) {
+      const d = new Date(state.currentDateMs);
+      badgeCurrent.innerText = d.toLocaleDateString('en-US', { year: 'numeric', month: 'short' }).toUpperCase();
+    }
+
+    // Update event dots on timeline
+    updateVoyagerEventDots(state);
+
+    // Update flyby track markers active state
+    const flybyMarkers = document.querySelectorAll('.voyager-flyby-marker');
+    flybyMarkers.forEach(m => {
+      const eventLabel = state.flybyEvent ? (state.flybyEvent.targetPlanet || state.flybyEvent.name.replace(/ .*/, '')) : '';
+      const markerLabel = m.dataset.planet || '';
+      const isActive = state.flybyActive && state.flybyEvent && (eventLabel === markerLabel || (state.flybyEvent.name && state.flybyEvent.name.includes(markerLabel)));
+      m.classList.toggle('active', !!isActive);
+      if (isActive && m.dataset.eventType === 'milestone') {
+        m.style.color = '#ffcc33';
+        m.style.borderTopColor = '#ffcc33';
+        const dot = m.querySelector('.marker-dot');
+        if (dot) { dot.style.background = '#ffcc33'; dot.style.boxShadow = '0 0 10px rgba(255,204,51,0.6)'; }
+      }
+    });
+
+    // Position planets at correct dates
+    const planetPositions = getAllPlanetPositions(state.currentDateMs);
+    planets.forEach(p => {
+      const pos = planetPositions[p.data.name];
+      if (pos) {
+        p.angle = pos.angle;
+        const ecc = p.data.eccentricity || 0;
+        const semiMinor = p.a * Math.sqrt(1 - ecc * ecc);
+        p.mesh.position.set(p.a * Math.cos(pos.angle), 0, semiMinor * Math.sin(pos.angle));
+      }
+      p.mesh.rotation.y += 0.01;
+    });
+
+    // Keep moons relative to their parent planets
+    planets.forEach(p => {
+      if (p.moons) p.moons.forEach(m => {
+        m.angle += m.speed * 0.5;
+        const mx = p.mesh.position.x + m.data.distance * Math.cos(m.angle);
+        const mz = p.mesh.position.z + m.data.distance * Math.sin(m.angle);
+        m.mesh.position.set(mx, 0, mz);
+        m.mesh.rotation.y += 0.03;
+      });
+    });
+
+    // Sun rotation
+    sun.rotation.y += 0.002;
+    const pulse = 1 + Math.sin(Date.now() * 0.001) * 0.02;
+    sunGlow.scale.setScalar(pulse);
+
+    // Position both spacecraft
+    const craft = voyagerCraftId === 1 ? voyagerCraft1 : voyagerCraft2;
+    craft.position.set(state.scX, 0, state.scZ);
+    voyagerCraft1.position.set(stateV1.scX, 0, stateV1.scZ);
+    voyagerCraft2.position.set(stateV2.scX, 0, stateV2.scZ);
+
+    // Orient both crafts
+    function orientCraft(c, s) {
+      if (s.vx !== undefined && s.vz !== undefined) {
+        if (Math.abs(s.vx) > 0.0001 || Math.abs(s.vz) > 0.0001) {
+          c.rotation.y = Math.atan2(s.vx, s.vz);
+          return;
+        }
+      }
+      if (s.nextPos && s.prevPos) {
+        const dx = s.nextPos.x - s.prevPos.x;
+        const dz = s.nextPos.z - s.prevPos.z;
+        if (Math.abs(dx) > 0.001 || Math.abs(dz) > 0.001) c.rotation.y = Math.atan2(dx, dz);
+      }
+    }
+    orientCraft(voyagerCraft1, stateV1);
+    orientCraft(voyagerCraft2, stateV2);
+
+    // Update both trails
+    updateTrail(trailV1, stateV1.scX, stateV1.scZ);
+    updateTrail(trailV2, stateV2.scX, stateV2.scZ);
+
+    // Flyby notification + image overlay
+    let lookTarget;
+    if (state.lookAtPlanet) {
+      const targetObj = planets.find(p => p.data.name === state.lookAtPlanet);
+      if (targetObj) {
+        lookTarget = new THREE.Vector3();
+        targetObj.mesh.getWorldPosition(lookTarget);
+
+        // Cockpit view: move camera to follow spacecraft
+        if (voyagerCockpitView) {
+          const camDir = new THREE.Vector3().subVectors(lookTarget, craft.position).normalize();
+          const distance = state.flybyActive ? 8 : Math.max(state.scR * 0.4, 15);
+          const camPos = craft.position.clone().add(camDir.clone().multiplyScalar(-distance));
+          camPos.y = state.flybyActive ? 3 : Math.min(15 + state.scR * 0.1, 40);
+          camera.position.lerp(camPos, 0.03);
+          controls.target.lerp(lookTarget, 0.03);
+        }
+
+        if (state.flybyActive && state.flybyEvent) {
+          if (state.flybyEvent.name !== voyagerLastFlyby) {
+            voyagerLastFlyby = state.flybyEvent.name;
+            if (state.flybyEvent.type === 'flyby') {
+              updateVoyagerImageOverlay(state.flybyEvent.name, true);
+            } else {
+              updateVoyagerImageOverlay(null, false);
+            }
+          }
+        } else {
+          updateVoyagerImageOverlay(null, false);
+        }
+      }
+    } else if (voyagerCockpitView) {
+      // No target — follow spacecraft from behind, looking out into the galaxy
+      const dir = new THREE.Vector3(-state.scX, 0, -state.scZ).normalize();
+      const behind = new THREE.Vector3(state.scX, 0, state.scZ).add(dir.multiplyScalar(30));
+      behind.y = 20 + state.scR * 0.05;
+      camera.position.lerp(behind, 0.03);
+      controls.target.lerp(new THREE.Vector3(state.scX * 2, 0, state.scZ * 2), 0.03);
+    }
+
+    // Update belts
+    asteroidBelt.rotation.y += asteroidBelt.userData.speed * 5;
+    kuiperBelt.rotation.y += kuiperBelt.userData.speed * 5;
+
+    // Auto-zoom base view to keep trails visible
+    if (!voyagerCockpitView) {
+      const maxR = Math.max(stateV1.scR, stateV2.scR, 30);
+      const idealDist = Math.max(maxR * 2.2, 150);
+      const dir = new THREE.Vector3().subVectors(camera.position, controls.target).normalize();
+      const targetPos = controls.target.clone().add(dir.multiplyScalar(idealDist));
+      camera.position.lerp(targetPos, 0.008);
+    }
+
   } else {
     // Normal Simulation
     planets.forEach((p) => {
@@ -952,7 +1404,7 @@ function animate() {
       p.mesh.rotation.y += 0.01;
       
       // Moons Position relative to parent
-      p.moons.forEach((m) => {
+      if (p.moons) p.moons.forEach((m) => {
         m.angle += m.speed * timeScale;
         const mx = p.mesh.position.x + m.data.distance * Math.cos(m.angle);
         const mz = p.mesh.position.z + m.data.distance * Math.sin(m.angle);
@@ -1020,6 +1472,186 @@ planets.forEach(p => {
 asteroidBelt.visible = false;
 kuiperBelt.visible = false;
 dustSystem.visible = true;
+
+// ── Voyager Helper Functions ──
+let voyagerEventDotsBuilt = false;
+
+function buildVoyagerEventDots() {
+  const track = document.getElementById('voyager-events-track');
+  if (!track) return;
+  track.innerHTML = '';
+  const events = getVoyagerTimeline(voyagerCraftId);
+  const dateRange = getVoyagerDateRange(voyagerCraftId);
+  const markers = events.filter(e => e.type === 'flyby' || e.type === 'milestone');
+  markers.forEach((event) => {
+    const dot = document.createElement('div');
+    dot.className = 'voyager-event-dot';
+    dot.dataset.date = event.date;
+    const eventT = (new Date(event.date).getTime() - dateRange.startMs) / (dateRange.endMs - dateRange.startMs);
+    dot.style.position = 'absolute';
+    dot.style.left = `${eventT * 100}%`;
+    dot.style.transform = 'translateX(-50%)';
+    const label = event.targetPlanet || event.name;
+    dot.title = `${event.name} (${label})`;
+    // Milestones get a slightly different color
+    if (event.type === 'milestone') {
+      dot.style.background = 'rgba(255,200,50,0.3)';
+      dot.style.borderColor = 'rgba(255,200,50,0.5)';
+    }
+    track.appendChild(dot);
+  });
+  voyagerEventDotsBuilt = true;
+}
+
+function updateVoyagerCraftButtons() {
+  const c1 = document.getElementById('voyager-craft-1');
+  const c2 = document.getElementById('voyager-craft-2');
+  if (!c1 || !c2) return;
+  const active = 'rgba(0,200,255,0.2)';
+  const inactive = 'transparent';
+  const activeText = '#fff';
+  const inactiveText = 'rgba(255,255,255,0.5)';
+  c1.style.background = voyagerCraftId === 1 ? active : inactive;
+  c1.style.color = voyagerCraftId === 1 ? activeText : inactiveText;
+  c2.style.background = voyagerCraftId === 2 ? active : inactive;
+  c2.style.color = voyagerCraftId === 2 ? activeText : inactiveText;
+}
+
+function rebuildVoyagerFlybyTrack() {
+  const flybyTrack = document.getElementById('voyager-flyby-track');
+  if (!flybyTrack) return;
+  flybyTrack.innerHTML = '';
+  const events = getVoyagerTimeline(voyagerCraftId);
+  const markers = events.filter(e => e.type === 'flyby' || e.type === 'milestone');
+  markers.forEach((event) => {
+    const marker = document.createElement('div');
+    marker.className = 'voyager-flyby-marker';
+    const label = event.targetPlanet || event.name.replace(/ .*/, '');
+    marker.innerHTML = `<span class="marker-dot"></span><br>${label}`;
+    marker.dataset.planet = event.targetPlanet || '';
+    marker.dataset.eventType = event.type;
+    if (event.type === 'milestone') {
+      marker.style.color = 'rgba(255,200,50,0.3)';
+      marker.querySelector('.marker-dot').style.background = 'rgba(255,200,50,0.2)';
+    }
+    flybyTrack.appendChild(marker);
+  });
+}
+
+// Voyager flyby images from NASA/JPL
+const FLYBY_IMAGES = {
+  'Jupiter Flyby': {
+    url: 'https://images-assets.nasa.gov/image/PIA00343/PIA00343~orig.jpg',
+    caption: 'Jupiter\'s Great Red Spot — a storm larger than Earth, seen by Voyager 1',
+  },
+  'Saturn Flyby': {
+    url: 'https://images-assets.nasa.gov/image/PIA02224/PIA02224~orig.jpg',
+    caption: 'Saturn\'s majestic rings, captured by Voyager 2 from 21 million km',
+  },
+  'Uranus Flyby': {
+    url: 'https://images-assets.nasa.gov/image/PIA00142/PIA00142~orig.jpg',
+    caption: 'Uranus — a featureless blue-green world tilted on its side',
+  },
+  'Neptune Flyby': {
+    url: 'https://images-assets.nasa.gov/image/PIA01492/PIA01492~medium.jpg',
+    caption: 'Neptune\'s Great Dark Spot and bright cloud streaks, Voyager 2, 1989',
+  },
+  'Pale Blue Dot': {
+    url: 'https://images-assets.nasa.gov/image/PIA23645/PIA23645~medium.jpg',
+    caption: 'The Pale Blue Dot — Earth seen from 6 billion km, Carl Sagan\'s vision',
+  },
+  'Kuiper Belt Crossing': {
+    url: 'https://images-assets.nasa.gov/image/PIA17046/PIA17046~medium.jpg',
+    caption: 'Artist\'s concept of the Kuiper Belt — icy bodies beyond Neptune',
+  },
+  'Interstellar Space': {
+    url: 'https://images-assets.nasa.gov/image/PIA22949/PIA22949~orig.jpg',
+    caption: 'Voyager enters interstellar space — the first human-made object to do so',
+  },
+};
+
+function syncVoyagerImageHeight() {
+  const overlay = document.getElementById('voyager-image-overlay');
+  if (!overlay) return;
+  overlay.style.height = '200px';
+}
+
+function updateVoyagerImageOverlay(eventName, show) {
+  const overlay = document.getElementById('voyager-image-overlay');
+  if (!overlay) return;
+  if (!show || !eventName || !FLYBY_IMAGES[eventName]) {
+    overlay.style.opacity = '0';
+    setTimeout(() => { if (overlay && overlay.style.opacity === '0') overlay.style.display = 'none'; }, 1100);
+    return;
+  }
+  const imgData = FLYBY_IMAGES[eventName];
+  const imgEl = document.getElementById('voyager-flyby-img');
+  const capEl = document.getElementById('voyager-img-caption');
+  const placeholderEl = document.getElementById('voyager-img-placeholder');
+  if (imgEl) {
+    imgEl.style.display = 'block';
+    imgEl.src = imgData.url;
+  }
+  if (capEl) capEl.innerText = imgData.caption;
+  if (placeholderEl) placeholderEl.style.display = 'none';
+  overlay.style.display = 'block';
+  syncVoyagerImageHeight();
+  void overlay.offsetWidth;
+  overlay.style.opacity = '1';
+}
+
+// Click image to open lightbox (not when clicking close button)
+document.addEventListener('click', function (e) {
+  if (e.target.closest('#voyager-img-close')) return;
+  const overlay = document.getElementById('voyager-image-overlay');
+  if (overlay && overlay.contains(e.target) && overlay.style.display !== 'none' && parseFloat(overlay.style.opacity) > 0) {
+    const imgEl = document.getElementById('voyager-flyby-img');
+    const capEl = document.getElementById('voyager-img-caption');
+    const lb = document.getElementById('voyager-lightbox');
+    const lbImg = document.getElementById('voyager-lightbox-img');
+    const lbCap = document.getElementById('voyager-lightbox-caption');
+    if (!lb || !lbImg || !imgEl || !imgEl.src) return;
+    lbImg.src = imgEl.src;
+    if (lbCap && capEl) lbCap.innerText = capEl.innerText;
+    lb.style.display = 'flex';
+    void lb.offsetWidth;
+    lb.style.opacity = '1';
+  }
+});
+
+// Close image overlay close button
+document.addEventListener('click', function (e) {
+  const closeBtn = e.target.closest('#voyager-img-close');
+  if (!closeBtn) return;
+  const overlay = document.getElementById('voyager-image-overlay');
+  if (!overlay) return;
+  overlay.style.opacity = '0';
+  setTimeout(() => { if (overlay && overlay.style.opacity === '0') overlay.style.display = 'none'; }, 1100);
+});
+
+// Close lightbox on backdrop click or close button
+document.addEventListener('click', function (e) {
+  const lb = document.getElementById('voyager-lightbox');
+  if (!lb || lb.style.display === 'none') return;
+  if (e.target === lb || e.target.closest('#voyager-lightbox-close')) {
+    lb.style.opacity = '0';
+    setTimeout(() => { lb.style.display = 'none'; }, 300);
+  }
+});
+
+function updateVoyagerEventDots(state) {
+  const track = document.getElementById('voyager-events-track');
+  if (!track) return;
+  if (!voyagerEventDotsBuilt) buildVoyagerEventDots();
+  const dots = track.querySelectorAll('.voyager-event-dot');
+  dots.forEach(dot => {
+    const isActive = state.flybyEvent && state.flybyEvent.date === dot.dataset.date;
+    dot.classList.toggle('active', !!isActive);
+  });
+}
+
+
+// ── End Voyager Helper Functions ──
 
 // --- Responsive ---
 window.addEventListener('resize', () => {

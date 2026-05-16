@@ -165,6 +165,7 @@
         padding: 0;
         width: 64px; /* override global button width:100% */
         position: relative;
+        z-index: 201;
       }
       .fab:hover {
         transform: scale(1.12) translateY(-3px);
@@ -384,6 +385,58 @@
         box-shadow: 0 8px 28px rgba(74,144,226,0.32) !important;
         transform: translateY(-1px);
       }
+
+      /* ── Voyager Mode Styles ── */
+      .voyager-event-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: rgba(0, 204, 255, 0.4);
+        border: 1px solid rgba(0, 204, 255, 0.6);
+        transition: all 0.3s;
+        cursor: pointer;
+        position: relative;
+      }
+      .voyager-event-dot:hover {
+        transform: scale(1.5);
+        background: rgba(0, 204, 255, 0.8);
+      }
+      .voyager-event-dot.active {
+        background: #00ccff;
+        box-shadow: 0 0 12px rgba(0, 204, 255, 0.7);
+        transform: scale(1.3);
+      }
+
+      .voyager-flyby-marker {
+        flex: 1;
+        text-align: center;
+        font-size: 0.65rem;
+        color: rgba(255,255,255,0.35);
+        padding: 2px 0;
+        border-top: 2px solid rgba(255,255,255,0.08);
+        position: relative;
+        transition: color 0.3s;
+      }
+      .voyager-flyby-marker.active {
+        color: #00ccff;
+        border-top-color: #00ccff;
+      }
+      .voyager-flyby-marker .marker-dot {
+        position: absolute;
+        top: -5px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.15);
+        transition: all 0.3s;
+      }
+      .voyager-flyby-marker.active .marker-dot {
+        background: #00ccff;
+        box-shadow: 0 0 10px rgba(0, 204, 255, 0.6);
+      }
+
     </style>
   </head>
   <body>
@@ -591,6 +644,31 @@
           ✨
           <span class="fab-tooltip">Solar System Genesis</span>
         </button>
+        
+        <div style="position:relative; display:flex; align-items:center; justify-content:center; gap:15px;">
+          <!-- Close Voyager Button -->
+          <button class="fab" id="fab-voyager-close" title="Exit Voyager Mode" style="display:none; background:rgba(255,50,50,0.2); border-color:rgba(255,50,50,0.4); color:#ff8888; font-size:1.2rem;">
+            ✕
+            <span class="fab-tooltip">Exit Mission</span>
+          </button>
+
+          <!-- Switch Spacecraft Button (V1/V2) -->
+          <button class="fab" id="fab-voyager-switch" title="Switch Spacecraft" style="display:none; background:rgba(255,200,50,0.15); border-color:rgba(255,200,50,0.4); color:#ffcc33; font-size:1.1rem; font-weight:bold;">
+            V2
+            <span class="fab-tooltip">Switch Voyager</span>
+          </button>
+
+          <div style="position:relative;">
+            <div id="voyager-badge" style="display:none; position:absolute; bottom:calc(100% + 20px); left:50%; transform:translateX(-50%); background:rgba(0,10,30,0.9); border:2px solid #00ccff; padding:8px 16px; border-radius:20px; font-size:0.8rem; color:#fff; white-space:nowrap; pointer-events:none; box-shadow:0 0 25px rgba(0,204,255,0.5); z-index:1000; line-height:1.3; font-weight:600; text-align:center;">
+               <div style="font-size:0.65rem; color:rgba(0,204,255,0.8); text-transform:uppercase; letter-spacing:0.1em; margin-bottom:4px; border-bottom:1px solid rgba(0,204,255,0.2); padding-bottom:2px;">Mission Timeline</div>
+               <span id="voyager-badge-start" style="color:rgba(255,255,255,0.6)">1977</span> <span style="color:#00ccff; margin:0 4px;">→</span> <span id="voyager-badge-current" style="color:#00ccff; text-shadow:0 0 8px rgba(0,204,255,0.5)">2026</span>
+            </div>
+            <button class="fab" id="fab-voyager" title="Voyager Mission">
+              <span class="fab-icon">🛸</span>
+              <span class="fab-tooltip">Voyager Mission</span>
+            </button>
+          </div>
+        </div>
       </div>
 
       <div id="formation-ui" style="display:none; position:absolute; bottom:30px; left:50%; transform:translateX(-50%); width:90%; max-width:700px; z-index:10; background:rgba(10,10,30,0.85); padding:20px; border-radius:24px; color:white; font-family:'Outfit', sans-serif; pointer-events:auto; border:1px solid rgba(100,180,255,0.3); backdrop-filter:blur(15px); flex-direction:column; gap:15px; box-shadow:0 10px 40px rgba(0,0,0,0.6);">
@@ -604,7 +682,7 @@
         </div>
 
         <div style="display:flex; align-items:center; gap:15px;">
-          <button id="play-pause-btn" style="width:48px; height:48px; border-radius:24px; border:none; background:linear-gradient(135deg, #4a90e2, #9333ea); color:white; font-size:1.4rem; cursor:pointer; display:flex; justify-content:center; align-items:center; box-shadow:0 4px 15px rgba(147,51,234,0.4); transition:transform 0.1s;">⏸️</button>
+          <button id="play-pause-btn" data-state="playing" style="width:48px; height:48px; border-radius:24px; border:none; background:linear-gradient(135deg, #4a90e2, #9333ea); color:white; font-size:1.4rem; cursor:pointer; display:flex; justify-content:center; align-items:center; box-shadow:0 4px 15px rgba(147,51,234,0.4); transition:transform 0.1s;">⏸️</button>
           
           <div id="timeline-runner-wrap">
             <input type="range" id="formation-timeline" min="0" max="20" step="0.01" value="0" style="height:10px; border-radius:5px; -webkit-appearance:none; background:rgba(255,255,255,0.15); outline:none; cursor:pointer; border:1px solid rgba(255,255,255,0.1);">
@@ -637,7 +715,7 @@
                 <g transform="translate(17,32)">
                   <g id="svg-rl" class="rl">
                     <line x1="0" y1="0" x2="6" y2="18" stroke="var(--rc,#b8d8ff)" stroke-width="3" stroke-linecap="round"/>
-                    <!-- Right knee: pivot at (6,18), lower leg goes slightly left: origin 100% 0% -->
+                    <!-- Right knee: pivot at (6,18), lower leg goes slightly left: origin 0% 0% -->
                     <g transform="translate(6,18)">
                       <line id="svg-rk" class="rl" x1="0" y1="0" x2="-3" y2="17" stroke="var(--rc,#b8d8ff)" stroke-width="2.5" stroke-linecap="round"/>
                     </g>
@@ -655,11 +733,30 @@
           </div>
         </div>
       </div>
+
+      <!-- ── Voyager Image Overlay ── -->
+      <div id="voyager-image-overlay" style="display:none; position:fixed; bottom:30px; right:30px; width:240px; z-index:100; opacity:0; transition:opacity 1s ease; border:1px solid rgba(0,200,255,0.25); box-shadow:0 0 12px rgba(0,200,255,0.08); background:#0a0a1a; border-radius:8px; overflow:hidden;">
+        <div style="position:relative; width:100%; height:100%; display:flex; align-items:center; justify-content:center; background:#050510;">
+          <div id="voyager-img-placeholder" style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center; color:rgba(0,200,255,0.08); font-size:2rem;">🛸</div>
+          <img id="voyager-flyby-img" src="" alt="Voyager image" referrerpolicy="no-referrer" style="width:100%; height:100%; display:block; object-fit:contain; position:relative; z-index:1; background:#050510;" onerror="this.style.display='none';var p=document.getElementById('voyager-img-placeholder');if(p)p.style.display='flex';">
+        </div>
+        <div id="voyager-img-close" style="position:absolute; top:6px; right:6px; width:32px; height:32px; border-radius:16px; background:rgba(220,30,30,0.7); border:2px solid rgba(255,60,60,0.5); color:white; font-size:1.2rem; cursor:pointer; display:flex; justify-content:center; align-items:center; z-index:3; transition:background 0.2s; font-family:sans-serif; user-select:none;">✕</div>
+        <div style="position:absolute; bottom:0; left:0; right:0; background:linear-gradient(transparent, rgba(0,0,0,0.8)); padding:18px 8px 6px; z-index:2;">
+          <div id="voyager-img-caption" style="font-size:0.65rem; color:rgba(255,255,255,0.8); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; letter-spacing:0.03em;"></div>
+        </div>
+      </div>
+
+      <!-- ── Voyager Image Lightbox ── -->
+      <div id="voyager-lightbox" style="display:none; position:fixed; inset:0; z-index:200; background:rgba(0,0,0,0.85); backdrop-filter:blur(10px); justify-content:center; align-items:center; flex-direction:column; padding:40px; opacity:0; transition:opacity 0.3s ease; cursor:pointer;">
+        <button id="voyager-lightbox-close" style="position:fixed; top:20px; right:20px; width:44px; height:44px; border-radius:22px; border:1px solid rgba(255,255,255,0.2); background:rgba(0,0,0,0.5); color:white; font-size:1.4rem; cursor:pointer; display:flex; justify-content:center; align-items:center; z-index:201; transition:background 0.2s;">✕</button>
+        <img id="voyager-lightbox-img" style="max-width:90vw; max-height:70vh; border-radius:12px; box-shadow:0 20px 60px rgba(0,0,0,0.8); cursor:default;" src="">
+        <div id="voyager-lightbox-caption" style="color:rgba(255,255,255,0.85); margin-top:16px; font-size:1rem; text-align:center; max-width:600px; line-height:1.5; cursor:default;"></div>
+        <div id="voyager-lightbox-credit" style="color:rgba(255,255,255,0.35); margin-top:8px; font-size:0.75rem; letter-spacing:0.05em; cursor:default;">📸 NASA / JPL-Caltech</div>
+      </div>
     </div>
 
     <script type="module" src="/main.js"></script>
     <script>
-      // ── Origin Story Modal ──
       (function () {
         const overlay   = document.getElementById('origin-overlay');
         const launchBtn = document.getElementById('origin-launch-btn');
@@ -699,12 +796,27 @@
         });
 
         document.getElementById('fab-genesis').addEventListener('click', () => {
-          // Reset and re-run the formation animation
           document.dispatchEvent(new Event('startFormation'));
-          const formationUiEl = document.getElementById('formation-ui');
-          if (formationUiEl) formationUiEl.style.display = 'flex';
         });
-        autoTimer = setTimeout(dismiss, 15000);
+
+        document.getElementById('fab-voyager').addEventListener('click', () => {
+          const fab = document.getElementById('fab-voyager');
+          if (fab.dataset.voyagerActive === 'true') {
+            document.dispatchEvent(new Event('toggleVoyagerCockpit'));
+          } else {
+            document.dispatchEvent(new Event('startVoyagerMode'));
+          }
+        });
+
+        document.getElementById('fab-voyager-close').addEventListener('click', () => {
+          document.dispatchEvent(new Event('closeVoyagerMode'));
+        });
+
+        document.getElementById('fab-voyager-switch').addEventListener('click', () => {
+          const btn = document.getElementById('fab-voyager-switch');
+          const nextCraft = btn.innerText.includes('V1') ? 1 : 2;
+          document.dispatchEvent(new CustomEvent('switchVoyagerCraft', { detail: { craft: nextCraft } }));
+        });
 
         document.getElementById('skip-formation-btn').addEventListener('click', () => {
           document.dispatchEvent(new Event('skipFormation'));
@@ -717,8 +829,9 @@
 
         playBtn.addEventListener('click', () => {
           document.dispatchEvent(new Event('toggleFormationPause'));
-          const isPaused = playBtn.innerText === '⏸️';
-          playBtn.innerText = isPaused ? '▶️' : '⏸️';
+          const isPaused = playBtn.dataset.state === 'paused';
+          playBtn.dataset.state = isPaused ? 'playing' : 'paused';
+          playBtn.innerText = isPaused ? '⏸️' : '▶️';
         });
 
         timeline.addEventListener('input', (e) => {
@@ -738,6 +851,7 @@
             document.dispatchEvent(new CustomEvent('changeFormationSpeed', { detail: { speed: parseFloat(btn.dataset.speed) } }));
           });
         });
+
         // Setup Tabs for Planets
         document.querySelectorAll('.tab-btn').forEach(btn => {
           btn.addEventListener('click', (e) => {
@@ -762,6 +876,7 @@
           });
         });
 
+        autoTimer = setTimeout(dismiss, 15000);
       })();
     </script>
   </body>
