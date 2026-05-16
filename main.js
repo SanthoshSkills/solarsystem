@@ -759,22 +759,52 @@ function animate() {
 
       // Rate of narrative time flow (BYA per unit t) — matches piecewise yearsAgo function
       let narrativeRate;
-      if (t < 0.4)      narrativeRate = 0.10;  // 0.04 BYA over 40% of slider
-      else if (t < 0.7) narrativeRate = 0.20;  // 0.06 BYA over 30%
-      else if (t < 0.9) narrativeRate = 3.50;  // 0.70 BYA over 20%
-      else              narrativeRate = 38.0;  // 3.80 BYA over 10%
+      if (t < 0.4)      narrativeRate = 0.10;
+      else if (t < 0.7) narrativeRate = 0.20;
+      else if (t < 0.9) narrativeRate = 3.50;
+      else              narrativeRate = 38.0;
 
-      // Map log-scale rate → animation duration (2.0s=jog → 0.18s=sprint)
+      // Map log-scale rate → duration (1.8s jog → 0.18s sprint)
       const logRate = Math.log(narrativeRate / 0.10) / Math.log(38.0 / 0.10);
-      const dur = Math.max(0.18, 2.0 - logRate * 1.82);
-      runner.style.animationDuration = `${dur}s`;
-      if (runnerShadow) runnerShadow.style.animationDuration = `${dur}s`;
+      const dur = Math.max(0.18, 1.8 - logRate * 1.62);
 
-      // Pause runner when animation is paused
+      // Color shift: cool white-blue (slow) → warm yellow → blazing red-orange (sprint)
+      // logRate 0=slow, 1=sprint
+      let rc, glow;
+      if (logRate < 0.33) {
+        // White-blue (cloud/disk phase)
+        rc   = `rgb(180,220,255)`;
+        glow = `rgba(100,180,255,0.9)`;
+      } else if (logRate < 0.66) {
+        // Warm yellow (bombardment)
+        rc   = `rgb(255,230,120)`;
+        glow = `rgba(255,200,60,0.9)`;
+      } else {
+        // Blazing red-orange (sprint through stable system)
+        const heat = (logRate - 0.66) / 0.34; // 0→1 within sprint phase
+        const r = 255;
+        const g = Math.round(160 - heat * 100);
+        const b = Math.round(40 - heat * 40);
+        rc   = `rgb(${r},${Math.max(g,0)},${Math.max(b,0)})`;
+        glow = `rgba(255,${Math.max(g-40,0)},0,0.95)`;
+      }
+
+      // Apply via CSS custom properties on the runner element (inherited by SVG children)
+      runner.style.setProperty('--run-dur', `${dur}s`);
+      runner.style.setProperty('--rc', rc);
+      runner.style.setProperty('--runner-glow', glow);
+      if (runnerShadow) {
+        runnerShadow.style.setProperty('--run-dur', `${dur}s`);
+        runnerShadow.style.setProperty('--runner-glow', glow);
+      }
+
+      // Pause/resume all limb animations via SVG element play-state
       const playState = formationPaused ? 'paused' : 'running';
       runner.style.animationPlayState = playState;
+      runner.querySelectorAll('.rl').forEach(el => el.style.animationPlayState = playState);
       if (runnerShadow) runnerShadow.style.animationPlayState = playState;
     }
+
 
     
     // Camera Cinematic Movement

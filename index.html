@@ -195,18 +195,54 @@
         letter-spacing: 0.04em;
       }
 
-      /* ── Timeline Runner ── */
-      @keyframes runBounce {
-        0%   { transform: translateX(-50%) translateY(0px) scaleX(1); }
-        20%  { transform: translateX(-50%) translateY(-6px) scaleX(1.05) rotate(-8deg); }
-        40%  { transform: translateX(-50%) translateY(0px) scaleX(0.95); }
-        60%  { transform: translateX(-50%) translateY(-4px) scaleX(1.05) rotate(5deg); }
-        80%  { transform: translateX(-50%) translateY(0px) scaleX(0.95); }
-        100% { transform: translateX(-50%) translateY(0px) scaleX(1); }
+
+      /* ── Timeline Runner (SVG Stick Figure) ── */
+      @keyframes runLegL {
+        0%   { transform: rotate(-48deg); }
+        25%  { transform: rotate(5deg); }
+        50%  { transform: rotate(40deg); }
+        75%  { transform: rotate(-8deg); }
+        100% { transform: rotate(-48deg); }
+      }
+      @keyframes runLegR {
+        0%   { transform: rotate(40deg); }
+        25%  { transform: rotate(-8deg); }
+        50%  { transform: rotate(-48deg); }
+        75%  { transform: rotate(5deg); }
+        100% { transform: rotate(40deg); }
+      }
+      @keyframes runKneeL {
+        0%   { transform: rotate(22deg); }
+        25%  { transform: rotate(6deg); }
+        50%  { transform: rotate(68deg); }
+        75%  { transform: rotate(42deg); }
+        100% { transform: rotate(22deg); }
+      }
+      @keyframes runKneeR {
+        0%   { transform: rotate(68deg); }
+        25%  { transform: rotate(42deg); }
+        50%  { transform: rotate(22deg); }
+        75%  { transform: rotate(6deg); }
+        100% { transform: rotate(68deg); }
+      }
+      @keyframes runArmL {
+        0%   { transform: rotate(42deg); }
+        50%  { transform: rotate(-42deg); }
+        100% { transform: rotate(42deg); }
+      }
+      @keyframes runArmR {
+        0%   { transform: rotate(-42deg); }
+        50%  { transform: rotate(42deg); }
+        100% { transform: rotate(-42deg); }
+      }
+      @keyframes runBodyBob {
+        0%, 100% { transform: translateY(0px); }
+        25%, 75%  { transform: translateY(-3px); }
+        50%       { transform: translateY(1px); }
       }
       @keyframes runnerShadow {
-        0%, 100% { transform: translateX(-50%) scaleX(1); opacity: 0.3; }
-        40%, 80%  { transform: translateX(-50%) scaleX(0.6); opacity: 0.15; }
+        0%, 100% { transform: translateX(-50%) scaleX(1); opacity: 0.4; }
+        25%, 75%  { transform: translateX(-50%) scaleX(0.55); opacity: 0.15; }
       }
 
       #timeline-runner-wrap {
@@ -215,33 +251,37 @@
         display: flex;
         align-items: center;
       }
-      #formation-timeline {
-        width: 100%;
-      }
+      #formation-timeline { width: 100%; }
+
       #timeline-runner {
         position: absolute;
-        bottom: calc(100% + 4px);
-        font-size: 1.5rem;
-        line-height: 1;
+        bottom: calc(100% + 6px);
         pointer-events: none;
         user-select: none;
-        animation: runBounce 0.6s ease-in-out infinite;
-        animation-play-state: running;
-        transform-origin: center bottom;
-        filter: drop-shadow(0 0 6px rgba(255,220,80,0.7));
         transition: left 0.05s linear;
-        white-space: nowrap;
+        animation: runBodyBob var(--run-dur, 0.55s) ease-in-out infinite;
+        animation-play-state: running;
+        filter: drop-shadow(0 0 8px var(--runner-glow, rgba(180,220,255,0.8)));
       }
+      /* All animated limb groups share these */
+      .rl { transform-box: fill-box; }
+      #svg-ll { transform-origin: 100% 0%; animation: runLegL var(--run-dur,0.55s) ease-in-out infinite; }
+      #svg-rl { transform-origin: 0%   0%; animation: runLegR var(--run-dur,0.55s) ease-in-out infinite; }
+      #svg-lk { transform-origin: 100% 0%; animation: runKneeL var(--run-dur,0.55s) ease-in-out infinite; }
+      #svg-rk { transform-origin: 0%   0%; animation: runKneeR var(--run-dur,0.55s) ease-in-out infinite; }
+      #svg-la { transform-origin: 100% 0%; animation: runArmL var(--run-dur,0.55s) ease-in-out infinite; }
+      #svg-ra { transform-origin: 0%   0%; animation: runArmR var(--run-dur,0.55s) ease-in-out infinite; }
+
       #timeline-runner-shadow {
         position: absolute;
-        bottom: -4px;
-        width: 18px;
-        height: 5px;
-        background: rgba(255,200,60,0.35);
+        bottom: -3px;
+        width: 22px;
+        height: 6px;
+        background: var(--runner-glow, rgba(180,220,255,0.3));
         border-radius: 50%;
         pointer-events: none;
-        animation: runnerShadow 0.6s ease-in-out infinite;
-        filter: blur(2px);
+        animation: runnerShadow var(--run-dur, 0.55s) ease-in-out infinite;
+        filter: blur(3px);
         transition: left 0.05s linear;
       }
 
@@ -568,7 +608,43 @@
           
           <div id="timeline-runner-wrap">
             <input type="range" id="formation-timeline" min="0" max="20" step="0.01" value="0" style="height:10px; border-radius:5px; -webkit-appearance:none; background:rgba(255,255,255,0.15); outline:none; cursor:pointer; border:1px solid rgba(255,255,255,0.1);">
-            <span id="timeline-runner" style="left:0%">🧑‍🚀</span>
+            <!-- SVG Stick Figure Runner -->
+            <div id="timeline-runner" style="left:0%">
+              <svg viewBox="0 0 36 72" width="32" height="64" overflow="visible">
+                <!-- Head -->
+                <circle cx="18" cy="6" r="5.5" fill="var(--rc,#b8d8ff)" />
+                <!-- Torso (with slight forward lean) -->
+                <line x1="18" y1="11" x2="17" y2="32" stroke="var(--rc,#b8d8ff)" stroke-width="3" stroke-linecap="round"/>
+                <!-- Left Arm: pivot at shoulder (18,16) — goes left so origin 100% 0% -->
+                <g transform="translate(18,16)">
+                  <line id="svg-la" class="rl" x1="0" y1="0" x2="-10" y2="13" stroke="var(--rc,#b8d8ff)" stroke-width="2.5" stroke-linecap="round"/>
+                </g>
+                <!-- Right Arm: pivot at shoulder (18,16) — goes right so origin 0% 0% -->
+                <g transform="translate(18,16)">
+                  <line id="svg-ra" class="rl" x1="0" y1="0" x2="10" y2="13" stroke="var(--rc,#b8d8ff)" stroke-width="2.5" stroke-linecap="round"/>
+                </g>
+                <!-- Left upper leg: pivot at hip (17,32) — goes left: origin 100% 0% -->
+                <g transform="translate(17,32)">
+                  <g id="svg-ll" class="rl">
+                    <line x1="0" y1="0" x2="-6" y2="18" stroke="var(--rc,#b8d8ff)" stroke-width="3" stroke-linecap="round"/>
+                    <!-- Left knee: pivot at (-6,18), lower leg goes slightly right: origin 0% 0% -->
+                    <g transform="translate(-6,18)">
+                      <line id="svg-lk" class="rl" x1="0" y1="0" x2="3" y2="17" stroke="var(--rc,#b8d8ff)" stroke-width="2.5" stroke-linecap="round"/>
+                    </g>
+                  </g>
+                </g>
+                <!-- Right upper leg: pivot at hip (17,32) — goes right: origin 0% 0% -->
+                <g transform="translate(17,32)">
+                  <g id="svg-rl" class="rl">
+                    <line x1="0" y1="0" x2="6" y2="18" stroke="var(--rc,#b8d8ff)" stroke-width="3" stroke-linecap="round"/>
+                    <!-- Right knee: pivot at (6,18), lower leg goes slightly left: origin 100% 0% -->
+                    <g transform="translate(6,18)">
+                      <line id="svg-rk" class="rl" x1="0" y1="0" x2="-3" y2="17" stroke="var(--rc,#b8d8ff)" stroke-width="2.5" stroke-linecap="round"/>
+                    </g>
+                  </g>
+                </g>
+              </svg>
+            </div>
             <span id="timeline-runner-shadow" style="left:0%"></span>
           </div>
           
