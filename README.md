@@ -21,51 +21,10 @@ This started as a weekend project with a very specific product brief from a very
 
 ## 🌟 Features
 
-- **✨ Solar System Genesis:** Cinematic 4.6 billion year formation sequence — watch a molecular cloud collapse into a spinning disk, the Sun ignite, and planets condense. Includes a scientifically accurate non-linear timeline, interactive scrubber, play/pause, and 1x/2x/4x speed controls.
-- **🔭 Cosmic Navigator:** One-click floating button to open the planet info carousel and focus on the Sun.
-- **24-Parameter Astronomical Database:** Deep dive into 24 accurate data points for every celestial body, neatly organized into 4 interactive tabs: Physical, Orbital, Atmosphere & Rotation, and System.
-- **Interactive 3D Navigation:** Roam the solar system with intuitive mouse controls — rotate, pan, and zoom.
-- **Dynamic Planet Info Carousel:** Click any planet or the Sun to pull up a tabbed info panel with fun facts and rich scientific data. Navigate between all bodies with arrow buttons.
-- **Moons:** All major moons rendered and toggleable. Each has its own 24-parameter info panel.
-- **Immersive Visuals:** Deep-space backdrop, realistic lighting, textured planets, and Saturn's rings — powered by Three.js.
-
----
-
-## 🚀 Tech Stack
-
-- **[Three.js](https://threejs.org/):** Core 3D engine for rendering planets, moons, rings, orbits, and the cinematic dust system.
-- **[Vite](https://vitejs.dev/):** Fast build tool and development server.
-- **Vanilla JavaScript:** Clean, lean, zero-framework logic.
-- **Vercel:** Deployment and hosting.
-
----
-
-## 💻 Getting Started
-
-### Prerequisites
-
-You will need [Node.js](https://nodejs.org/) installed on your machine.
-
-### Installation
-
-1. **Clone the repository:**
-   ```bash
-   git clone https://github.com/SanthoshSkills/solarsystem.git
-   cd solarsystem
-   ```
-
-2. **Install dependencies:**
-   ```bash
-   npm install
-   ```
-
-3. **Start the development server:**
-   ```bash
-   npm run dev
-   ```
-
-4. **Open the app:**
-   Navigate to `http://localhost:5173` in your browser.
+- **✨ Solar System Genesis:** Cinematic 4.6 billion year formation sequence — watch a molecular cloud collapse into a spinning disk, the Sun ignite, and planets condense. Now with an animated timeline runner that changes color from Blue to Red as it progresses.
+- **🚀 Voyager Mission:** Interactive, historically accurate 3D trajectory visualization for Voyager 1 & 2. Features flyby image carousels, mission timeline countdowns, and real-time path tracking.
+- **🔭 Cosmic Navigator:** Floating button to explore planetary data.
+- **Cinematic Mode:** Clean UI with Floating Action Buttons (Telescope, Genesis, Voyager) that act as mutually exclusive toggles for a seamless exploration experience.
 
 ---
 
@@ -76,10 +35,13 @@ You will need [Node.js](https://nodejs.org/) installed on your machine.
 | Rotate | Left click + drag |
 | Pan | Right click + drag |
 | Zoom | Scroll wheel |
-| Open planet info | Click any planet / Sun |
-| Navigate between planets | ◀ / ▶ arrows in the info panel |
-| Open Cosmic Navigator | 🔭 button (bottom-left) |
-| Replay Genesis animation | ✨ button (bottom-left) |
+| Toggle Mode / Play/Pause | Floating Action Buttons (bottom-left) |
+| Voyager Mode | 🛸 (Start) |
+| Voyager Pause | 🛸 (Play/Pause while active) |
+| Exit Voyager Mission | ✕ button |
+| Switch Voyager Craft | Toggle in Voyager menu |
+| Toggle planet carousel | 🔭 button |
+| Replay Genesis animation | ✨ button |
 | Toggle moon visibility | Show Moons switch (bottom-centre) |
 | Re-open origin story | 👨‍👩‍👦 button (top header) |
 
